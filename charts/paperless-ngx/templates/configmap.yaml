@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "paperless.configMapName" . }}
+  labels:
+    {{- include "paperless.labels" . | nindent 4 }}
+data:
+  PAPERLESS_TIME_ZONE: {{ .Values.paperless.timeZone | quote }}
+  PAPERLESS_OCR_LANGUAGE: {{ .Values.paperless.ocrLanguage | quote }}
+  {{- if .Values.paperless.url }}
+  PAPERLESS_URL: {{ .Values.paperless.url | quote }}
+  {{- end }}
+  {{- if .Values.paperless.allowedHosts }}
+  PAPERLESS_ALLOWED_HOSTS: {{ .Values.paperless.allowedHosts | quote }}
+  {{- end }}
+  {{- if .Values.paperless.csrfTrustedOrigins }}
+  PAPERLESS_CSRF_TRUSTED_ORIGINS: {{ .Values.paperless.csrfTrustedOrigins | quote }}
+  {{- end }}
+  PAPERLESS_DBENGINE: {{ include "paperless.dbEngine" . | quote }}
+  {{- if or .Values.cnpg.enabled .Values.externalDatabase.enabled }}
+  PAPERLESS_DBHOST: {{ include "paperless.dbHost" . | quote }}
+  PAPERLESS_DBPORT: {{ include "paperless.dbPort" . | quote }}
+  PAPERLESS_DBNAME: {{ include "paperless.dbName" . | quote }}
+  {{- if and .Values.externalDatabase.enabled .Values.externalDatabase.sslmode (eq (include "paperless.dbEngine" .) "postgresql") }}
+  PAPERLESS_DBSSLMODE: {{ .Values.externalDatabase.sslmode | quote }}
+  {{- end }}
+  {{- end }}
+  {{- if .Values.tika.enabled }}
+  PAPERLESS_TIKA_ENABLED: "1"
+  PAPERLESS_TIKA_ENDPOINT: "http://{{ include "paperless.tika.fullname" . }}:{{ .Values.tika.service.port }}"
+  {{- end }}
+  {{- if .Values.gotenberg.enabled }}
+  PAPERLESS_TIKA_GOTENBERG_ENDPOINT: "http://{{ include "paperless.gotenberg.fullname" . }}:{{ .Values.gotenberg.service.port }}"
+  {{- end }}
+  {{- range $k, $v := .Values.paperless.extraEnv }}
+  {{ $k }}: {{ $v | quote }}
+  {{- end }}

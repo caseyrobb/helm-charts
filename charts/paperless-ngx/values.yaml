@@ -1,0 +1,285 @@
+## Default values for paperless-ngx.
+## https://docs.paperless-ngx.com/
+
+nameOverride: ""
+fullnameOverride: ""
+
+image:
+  repository: ghcr.io/paperless-ngx/paperless-ngx
+  pullPolicy: IfNotPresent
+  ## Defaults to .Chart.AppVersion when unset.
+  tag: ""
+
+imagePullSecrets: []
+
+## Number of webserver replicas. Paperless ships an embedded scheduler/consumer
+## and writes to RWO PersistentVolumes by default; running more than one replica
+## requires RWX volumes and disabling the embedded consumer (see PAPERLESS_CONSUMER_*).
+replicaCount: 1
+
+## Pod-level security context.
+podSecurityContext:
+  fsGroup: 1000
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: false
+  capabilities:
+    drop:
+      - ALL
+
+serviceAccount:
+  create: true
+  automount: true
+  annotations: {}
+  name: ""
+
+## Paperless configuration. Keys are passed through as PAPERLESS_<KEY> env vars.
+## See https://docs.paperless-ngx.com/configuration/ for the full list.
+paperless:
+  url: ""
+  timeZone: "UTC"
+  ocrLanguage: "eng"
+  ## Comma-separated list of allowed hosts. Leave empty to allow all.
+  allowedHosts: "*"
+  ## Comma-separated list of trusted origins for CSRF, including scheme.
+  csrfTrustedOrigins: ""
+  ## Additional PAPERLESS_* env vars rendered into the ConfigMap.
+  extraEnv: {}
+
+## Initial superuser. If `existingSecret` is set, those keys are used and these
+## values are ignored.
+admin:
+  user: "admin"
+  ## Generated at install if left blank.
+  password: ""
+  email: ""
+  existingSecret: ""
+  existingSecretUserKey: "PAPERLESS_ADMIN_USER"
+  existingSecretPasswordKey: "PAPERLESS_ADMIN_PASSWORD"
+  existingSecretEmailKey: "PAPERLESS_ADMIN_MAIL"
+
+## Django SECRET_KEY. If empty, a random 50-char value is generated at install
+## and stored in the chart-managed Secret. Use `existingSecret` to manage it
+## externally (recommended for production).
+secretKey:
+  value: ""
+  existingSecret: ""
+  existingSecretKey: "PAPERLESS_SECRET_KEY"
+
+service:
+  type: ClusterIP
+  port: 80
+  ## Container port; matches the Paperless default.
+  targetPort: 8000
+  annotations: {}
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: paperless.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+  ##  - secretName: paperless-tls
+  ##    hosts:
+  ##      - paperless.local
+
+persistence:
+  ## /usr/src/paperless/data - SQLite (if used), search index, classifier model
+  data:
+    enabled: true
+    size: 5Gi
+    storageClass: ""
+    accessModes:
+      - ReadWriteOnce
+    existingClaim: ""
+  ## /usr/src/paperless/media - stored documents and thumbnails
+  media:
+    enabled: true
+    size: 20Gi
+    storageClass: ""
+    accessModes:
+      - ReadWriteOnce
+    existingClaim: ""
+  ## /usr/src/paperless/consume - inbox watched for new files
+  consume:
+    enabled: true
+    size: 2Gi
+    storageClass: ""
+    accessModes:
+      - ReadWriteOnce
+    existingClaim: ""
+  ## /usr/src/paperless/export - manual export target
+  export:
+    enabled: false
+    size: 5Gi
+    storageClass: ""
+    accessModes:
+      - ReadWriteOnce
+    existingClaim: ""
+
+resources: {}
+  ## limits:
+  ##   cpu: 2
+  ##   memory: 2Gi
+  ## requests:
+  ##   cpu: 250m
+  ##   memory: 512Mi
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+podAnnotations: {}
+podLabels: {}
+
+## Liveness/readiness probes use Paperless's /accounts/login/ which is always served.
+livenessProbe:
+  enabled: true
+  httpGet:
+    path: /accounts/login/
+    port: http
+  initialDelaySeconds: 60
+  periodSeconds: 30
+  timeoutSeconds: 10
+  failureThreshold: 5
+
+readinessProbe:
+  enabled: true
+  httpGet:
+    path: /accounts/login/
+    port: http
+  initialDelaySeconds: 20
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 5
+
+startupProbe:
+  enabled: true
+  httpGet:
+    path: /accounts/login/
+    port: http
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 60
+
+## ---------------------------------------------------------------------------
+## Database
+## ---------------------------------------------------------------------------
+## Exactly one of `cnpg.enabled` or `externalDatabase.enabled` should be true.
+## If both are false, Paperless falls back to its built-in SQLite on the `data`
+## PVC, which is only suitable for single-replica/light usage.
+database:
+  ## postgresql | mariadb | sqlite. Ignored when sourced from CNPG or external.
+  engine: "postgresql"
+
+## CloudNativePG-managed PostgreSQL cluster. Requires the CNPG operator to be
+## installed in the cluster: https://cloudnative-pg.io/
+cnpg:
+  enabled: true
+  ## Name of the Cluster CR. Defaults to "<release>-pg" when empty.
+  clusterName: ""
+  instances: 1
+  ## Image used by the Cluster.
+  imageName: "ghcr.io/cloudnative-pg/postgresql:16.4"
+  storage:
+    size: 10Gi
+    storageClass: ""
+  database: "paperless"
+  owner: "paperless"
+  ## Optional: name of an existing Secret with `username` and `password` keys
+  ## to bootstrap the application user. If empty, CNPG generates one and the
+  ## chart wires it through via valueFrom.
+  bootstrapSecret: ""
+  resources: {}
+  monitoring:
+    enabled: false
+  backup:
+    enabled: false
+    ## Provide a BarmanObjectStore configuration when enabled, e.g.:
+    ## barmanObjectStore:
+    ##   destinationPath: s3://my-bucket/paperless
+    ##   s3Credentials:
+    ##     accessKeyId:
+    ##       name: backup-creds
+    ##       key: ACCESS_KEY_ID
+    ##     secretAccessKey:
+    ##       name: backup-creds
+    ##       key: ACCESS_KEY
+    barmanObjectStore: {}
+    retentionPolicy: "30d"
+
+## External database. Used when cnpg.enabled=false and externalDatabase.enabled=true.
+externalDatabase:
+  enabled: false
+  host: ""
+  port: 5432
+  database: "paperless"
+  user: "paperless"
+  password: ""
+  ## Source credentials from an existing secret instead of inline values.
+  existingSecret: ""
+  existingSecretUserKey: "username"
+  existingSecretPasswordKey: "password"
+  ## sslmode applies to PostgreSQL only (disable | prefer | require | verify-ca | verify-full).
+  sslmode: ""
+
+## ---------------------------------------------------------------------------
+## Redis broker (Bitnami subchart). Disable to use an external broker.
+## ---------------------------------------------------------------------------
+redis:
+  enabled: true
+  architecture: standalone
+  auth:
+    enabled: false
+  master:
+    persistence:
+      enabled: true
+      size: 2Gi
+
+externalRedis:
+  enabled: false
+  ## Full URL, e.g. redis://:password@redis.example.com:6379
+  url: ""
+  existingSecret: ""
+  existingSecretKey: "PAPERLESS_REDIS"
+
+## ---------------------------------------------------------------------------
+## Gotenberg (Office conversion via headless Chromium / LibreOffice)
+## ---------------------------------------------------------------------------
+gotenberg:
+  enabled: true
+  image:
+    repository: docker.io/gotenberg/gotenberg
+    tag: "8.27"
+    pullPolicy: IfNotPresent
+  replicaCount: 1
+  service:
+    port: 3000
+  ## Default args mirror the upstream paperless compose recommendation: block
+  ## remote content in the chromium route used to convert .eml files.
+  args:
+    - "gotenberg"
+    - "--chromium-disable-javascript=true"
+    - "--chromium-allow-list=file:///tmp/.*"
+  resources: {}
+
+## ---------------------------------------------------------------------------
+## Apache Tika
+## ---------------------------------------------------------------------------
+tika:
+  enabled: true
+  image:
+    repository: docker.io/apache/tika
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  replicaCount: 1
+  service:
+    port: 9998
+  resources: {}

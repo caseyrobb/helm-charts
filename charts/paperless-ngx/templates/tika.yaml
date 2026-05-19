@@ -1,0 +1,49 @@
+{{- if .Values.tika.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "paperless.tika.fullname" . }}
+  labels:
+    {{- include "paperless.labels" . | nindent 4 }}
+    app.kubernetes.io/component: tika
+spec:
+  replicas: {{ .Values.tika.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "paperless.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: tika
+  template:
+    metadata:
+      labels:
+        {{- include "paperless.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: tika
+    spec:
+      containers:
+        - name: tika
+          image: "{{ .Values.tika.image.repository }}:{{ .Values.tika.image.tag }}"
+          imagePullPolicy: {{ .Values.tika.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 9998
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.tika.resources | nindent 12 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "paperless.tika.fullname" . }}
+  labels:
+    {{- include "paperless.labels" . | nindent 4 }}
+    app.kubernetes.io/component: tika
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.tika.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "paperless.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: tika
+{{- end }}

@@ -1,0 +1,22 @@
+# Helm packaged charts and dependency archives
+*.tgz
+charts/*/charts/*.tgz
+
+# Helm chart-releaser working directory
+.cr-release-packages/
+.cr-index/
+
+# Helm test output
+__snapshot__/
+
+# Editor / OS
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Local override values used during development
+values.local.yaml
+*.local.yaml
