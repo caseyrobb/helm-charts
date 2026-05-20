@@ -31,10 +31,6 @@ jobs:
         with:
           version: v3.16.2
 
-      - name: Add chart dependency repositories
-        run: |
-          helm repo add bitnami oci://registry-1.docker.io/bitnamicharts/redis
-
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.6.0
         with:
