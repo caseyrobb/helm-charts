@@ -5,8 +5,8 @@ on:
     branches:
       - master
     paths:
-      - 'charts/**'
-      - '.github/workflows/release.yaml'
+      - "charts/**"
+      - ".github/workflows/release.yaml"
 
 permissions:
   contents: write
@@ -33,7 +33,7 @@ jobs:
 
       - name: Add chart dependency repositories
         run: |
-          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm repo add bitnami oci://registry-1.docker.io/bitnamicharts/redis
 
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.6.0
