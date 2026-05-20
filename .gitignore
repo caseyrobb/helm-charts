@@ -1,6 +1,7 @@
 # Helm packaged charts and dependency archives
 *.tgz
 charts/*/charts/*.tgz
+Chart.lock
 
 # Helm chart-releaser working directory
 .cr-release-packages/
