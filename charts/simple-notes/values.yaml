@@ -53,10 +53,10 @@ affinity: {}
 # Persistence for notes data
 persistence:
   enabled: true
-  storageClass: "" # leave empty for default StorageClass
+  storageClass: ""
   accessMode: ReadWriteOnce
   size: 5Gi
-  # existingClaim: ""       # use an existing PVC instead
+  # existingClaim: ""
 
 # Authentication & WebDAV config
 auth:
