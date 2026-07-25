@@ -1,0 +1,17 @@
+apiVersion: v2
+name: simple-notes-sync
+description: WebDAV server for Simple Notes Sync (self-hosted notes synchronization)
+type: application
+version: 0.1.0
+appVersion: "2.13.1"
+keywords:
+  - webdav
+  - notes
+  - sync
+  - self-hosted
+home: https://github.com/inventory69/simple-notes-sync
+sources:
+  - https://github.com/inventory69/simple-notes-sync
+  - https://github.com/hacdias/webdav
+maintainers:
+  - name: Casey Robb
