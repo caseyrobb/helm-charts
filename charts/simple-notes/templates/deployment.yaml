@@ -51,12 +51,18 @@ spec:
             httpGet:
               path: /
               port: http
+              httpHeaders:
+                - name: Authorization
+                  value: "Basic cHJvYmU6cHJvYmUK"
             initialDelaySeconds: 10
             periodSeconds: 30
           readinessProbe:
             httpGet:
               path: /
               port: http
+              httpHeaders:
+                - name: Authorization
+                  value: "Basic cHJvYmU6cHJvYmUK"
             initialDelaySeconds: 5
             periodSeconds: 10
       volumes:
