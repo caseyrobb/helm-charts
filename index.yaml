@@ -120,6 +120,27 @@ entries:
   simple-notes-sync:
   - apiVersion: v2
     appVersion: 2.13.1
+    created: "2026-07-25T21:07:37.551294998Z"
+    description: WebDAV server for Simple Notes Sync (self-hosted notes synchronization)
+    digest: a777645ba474ba2a01f435d784f364e5ea7fc37d27465ea1c8d9f68945e816e4
+    home: https://github.com/inventory69/simple-notes-sync
+    keywords:
+    - webdav
+    - notes
+    - sync
+    - self-hosted
+    maintainers:
+    - name: Casey Robb
+    name: simple-notes-sync
+    sources:
+    - https://github.com/inventory69/simple-notes-sync
+    - https://github.com/hacdias/webdav
+    type: application
+    urls:
+    - https://github.com/caseyrobb/helm-charts/releases/download/simple-notes-sync-0.2.2/simple-notes-sync-0.2.2.tgz
+    version: 0.2.2
+  - apiVersion: v2
+    appVersion: 2.13.1
     created: "2026-07-25T21:02:33.214833705Z"
     description: WebDAV server for Simple Notes Sync (self-hosted notes synchronization)
     digest: 8fb58768ac7e49787e50f89b1074d6b317500927ecfa4bc14ae2cb73df2e4f5b
@@ -202,4 +223,4 @@ entries:
     urls:
     - https://github.com/caseyrobb/helm-charts/releases/download/simple-notes-sync-0.1.0/simple-notes-sync-0.1.0.tgz
     version: 0.1.0
-generated: "2026-07-25T21:02:33.214966523Z"
+generated: "2026-07-25T21:07:37.551323381Z"
