@@ -1,0 +1,73 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/hacdias/webdav
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: false
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+podSecurityContext: {}
+securityContext: {}
+
+service:
+  type: ClusterIP
+  port: 8080
+  # annotations: {}
+  # loadBalancerIP: ""
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: notes.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+  #  - secretName: notes-tls
+  #    hosts:
+  #      - notes.example.com
+
+resources: {}
+  # limits:
+  #   cpu: 200m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 50m
+  #   memory: 64Mi
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+# Persistence for notes data
+persistence:
+  enabled: true
+  storageClass: "" # leave empty for default StorageClass
+  accessMode: ReadWriteOnce
+  size: 5Gi
+  # existingClaim: ""       # use an existing PVC instead
+
+# Authentication & WebDAV config
+auth:
+  username: noteuser
+  password: "changeme"
+
+# Full config.yml content can be overridden here if needed
+# The chart templates a sensible default based on the upstream example
+config:
+  address: "0.0.0.0"
+  port: 8080
+  directory: "/data"
+  permissions: "CRUD"
+  debug: false
