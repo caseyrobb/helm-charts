@@ -2,7 +2,7 @@ apiVersion: v2
 name: simple-notes-sync
 description: WebDAV server for Simple Notes Sync (self-hosted notes synchronization)
 type: application
-version: 0.1.1
+version: 0.2.0
 appVersion: "2.13.1"
 keywords:
   - webdav
