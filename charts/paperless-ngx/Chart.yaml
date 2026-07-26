@@ -2,8 +2,8 @@ apiVersion: v2
 name: paperless-ngx
 description: A Helm chart for Paperless-ngx, a community-supported open-source document management system.
 type: application
-version: 0.3.0
-appVersion: "3.0.2"
+version: 0.3.1
+appVersion: "3.0.3"
 home: https://docs.paperless-ngx.com/
 icon: https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/resources/logo/web/png/Logo-Symbol/Black/PNG/Black%20logo%20-%20no%20background.png
 sources:
