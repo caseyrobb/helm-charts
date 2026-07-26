@@ -2,6 +2,35 @@ apiVersion: v1
 entries:
   paperless-ngx:
   - apiVersion: v2
+    appVersion: 3.0.3
+    created: "2026-07-26T16:07:23.615836069Z"
+    dependencies:
+    - condition: redis.enabled
+      name: redis
+      repository: oci://registry-1.docker.io/bitnamicharts
+      version: 25.5.3
+    description: A Helm chart for Paperless-ngx, a community-supported open-source
+      document management system.
+    digest: 39d7fab69225e38ae876d3e3560fdcbd8bd19be286d1465a7d70883eb561df00
+    home: https://docs.paperless-ngx.com/
+    icon: https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/resources/logo/web/png/Logo-Symbol/Black/PNG/Black%20logo%20-%20no%20background.png
+    keywords:
+    - paperless
+    - paperless-ngx
+    - document-management
+    - dms
+    - ocr
+    maintainers:
+    - name: Casey Robb
+      url: https://github.com/paperless-ngx/paperless-ngx
+    name: paperless-ngx
+    sources:
+    - https://github.com/paperless-ngx/paperless-ngx
+    type: application
+    urls:
+    - https://github.com/caseyrobb/helm-charts/releases/download/paperless-ngx-0.3.1/paperless-ngx-0.3.1.tgz
+    version: 0.3.1
+  - apiVersion: v2
     appVersion: 3.0.2
     created: "2026-07-25T18:18:49.114262747Z"
     dependencies:
@@ -223,4 +252,4 @@ entries:
     urls:
     - https://github.com/caseyrobb/helm-charts/releases/download/simple-notes-sync-0.1.0/simple-notes-sync-0.1.0.tgz
     version: 0.1.0
-generated: "2026-07-25T21:07:37.551323381Z"
+generated: "2026-07-26T16:07:23.615874931Z"
