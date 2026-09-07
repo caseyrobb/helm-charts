@@ -8,7 +8,7 @@ image:
   repository: ghcr.io/paperless-ngx/paperless-ngx
   pullPolicy: IfNotPresent
   ## Defaults to .Chart.AppVersion when unset.
-  tag: ""
+  tag: "3.1.3"
 
 imagePullSecrets: []
 
