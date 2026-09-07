@@ -1,0 +1,184 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "silo-server.fullname" . }}
+  labels:
+    {{- include "silo-server.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "silo-server.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+      labels:
+        {{- include "silo-server.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "silo-server.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: ui
+              containerPort: 8090
+              protocol: TCP
+            - name: jellyfin
+              containerPort: 8096
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: {{ include "silo-server.fullname" . }}-config
+            - secretRef:
+                name: {{ include "silo-server.fullname" . }}-secret
+          env:
+            # Database configuration
+            - name: SILO_DB_HOST
+              value: {{ include "silo-server.postgresql.host" . | quote }}
+            - name: SILO_DB_PORT
+              value: {{ default "5432" .Values.postgresql.port | quote }}
+            - name: SILO_DB_NAME
+              value: {{ .Values.postgresql.database | quote }}
+            - name: SILO_DB_USER
+              value: {{ .Values.postgresql.username | quote }}
+            # Redis configuration
+            - name: SILO_REDIS_HOST
+              value: {{ include "silo-server.redis.host" . | quote }}
+            - name: SILO_REDIS_PORT
+              value: {{ default "6379" .Values.redis.port | quote }}
+            # Webserver settings
+            - name: SILO_LISTEN
+              value: {{ .Values.config.silo_listen | quote }}
+            - name: SILO_URL
+              value: {{ .Values.config.silo_url | quote }}
+            - name: SILO_HOST
+              value: {{ .Values.config.silo_host | quote }}
+            - name: SILO_PORT
+              value: {{ .Values.config.silo_port | quote }}
+            - name: SILO_MEDIA_PORT
+              value: {{ .Values.config.silo_media_port | quote }}
+            # Directories
+            - name: SILO_TRANSCODE_DIR
+              value: {{ .Values.config.silo_transcode_dir | quote }}
+            - name: SILO_PLUGINS_DIR
+              value: {{ .Values.config.silo_plugins_dir | quote }}
+            - name: SILO_CATALOG_SEEDS_DIR
+              value: {{ .Values.config.silo_catalog_seeds_dir | quote }}
+            - name: SILO_MEDIA_DIR
+              value: {{ .Values.config.silo_media_dir | quote }}
+            # Hardware transcoding
+            - name: SILO_HWTRANSCODE_INTEL
+              value: {{ .Values.config.silo_hwtranscode_intel | quote }}
+            - name: SILO_HWTRANSCODE_VAAPI
+              value: {{ .Values.config.silo_hwtranscode_vaapi | quote }}
+            - name: SILO_CORS_ORIGINS
+              value: {{ .Values.config.silo_cors_origins | quote }}
+            # Logging
+            - name: SILO_LOG_LEVEL
+              value: {{ .Values.config.silo_log_level | quote }}
+          volumeMounts:
+            - name: transcode
+              mountPath: {{ .Values.config.silo_transcode_dir }}
+            - name: plugins
+              mountPath: {{ .Values.config.silo_plugins_dir }}
+            - name: catalog-seeds
+              mountPath: {{ .Values.config.silo_catalog_seeds_dir }}
+            - name: media
+              mountPath: {{ .Values.config.silo_media_dir }}
+            {{- if .Values.gpu.enabled }}
+            {{- if .Values.gpu.device.intel }}
+            - name: dev-dri
+              mountPath: /dev/dri
+            {{- end }}
+            {{- if .Values.gpu.device.nvidia }}
+            - name: nvidia-device-plugin
+              mountPath: /dev/nvidia0
+            - name: nvidia-device-plugin
+              mountPath: /dev/nvidia-uvm
+            - name: nvidia-device-plugin
+              mountPath: /dev/nvidia-uvm-tools
+            - name: nvidia-container-toolkit
+              mountPath: /usr/bin/nvidia-container-toolkit
+            {{- end }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- if .Values.gpu.enabled }}
+      nodeSelector:
+        kubernetes.io/os: linux
+        {{- if .Values.gpu.device.nvidia }}
+        nvidia.com/gpu.present: "true"
+        {{- end }}
+        {{- if .Values.gpu.device.intel }}
+        intel.com/qsv: "true"
+        {{- end }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        {{- if .Values.persistence.existingClaim }}
+        - name: transcode
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim }}
+        - name: media
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim }}
+        {{- else }}
+        - name: transcode
+          persistentVolumeClaim:
+            claimName: {{ include "silo-server.fullname" . }}-transcode
+        - name: media
+          persistentVolumeClaim:
+            claimName: {{ include "silo-server.fullname" . }}-media
+        {{- end }}
+        - name: plugins
+          emptyDir: {}
+        - name: catalog-seeds
+          emptyDir: {}
+        {{- if .Values.gpu.enabled }}
+        {{- if .Values.gpu.device.intel }}
+        - name: dev-dri
+          hostPath:
+            path: /dev/dri
+        {{- end }}
+        {{- if .Values.gpu.device.nvidia }}
+        - name: nvidia-device-plugin
+          hostPath:
+            path: /dev/nvidia0
+        - name: nvidia-device-plugin
+          hostPath:
+            path: /dev/nvidia-uvm
+        - name: nvidia-device-plugin
+          hostPath:
+            path: /dev/nvidia-uvm-tools
+        - name: nvidia-container-toolkit
+          hostPath:
+            path: /usr/bin/nvidia-container-toolkit
+        {{- end }}
+        {{- end }}

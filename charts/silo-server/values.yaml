@@ -1,0 +1,141 @@
+# Default values for silo-server
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: ghcr.io/silo-server/silo-server
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+
+securityContext: {}
+
+service:
+  type: ClusterIP
+  ports:
+    ui:
+      port: 8090
+      targetPort: 8090
+      protocol: TCP
+    jellyfin:
+      port: 8096
+      targetPort: 8096
+      protocol: TCP
+
+resources:
+  limits:
+    cpu: 2000m
+    memory: 4Gi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# PostgreSQL configuration
+postgresql:
+  enabled: true
+  name: postgresql
+  host: ""
+  port: 5432
+  database: silo
+  username: silo
+  password: ""
+  existingSecret: ""
+  existingSecretKey: postgresql-password
+
+# Redis configuration
+redis:
+  enabled: true
+  name: redis
+  host: ""
+  port: 6379
+  password: ""
+  existingSecret: ""
+  existingSecretKey: redis-password
+
+# Persistence settings
+persistence:
+  enabled: true
+  storageClass: ""
+  accessModes:
+    - ReadWriteOnce
+  size: 100Gi
+  # Subpath for each volume
+  transcodeSubPath: transcode
+  pluginsSubPath: plugins
+  catalogSeedsSubPath: catalog-seeds
+  mediaSubPath: media
+
+# Silo Server environment variables
+config:
+  # General settings
+  silo_url: "http://localhost:8090"
+  silo_host: "0.0.0.0"
+  silo_port: 8090
+  silo_media_port: 8096
+  silo_listen: "0.0.0.0:8090"
+  
+  # Paths
+  silo_transcode_dir: "/tmp/transcode"
+  silo_plugins_dir: "/app/plugins"
+  silo_catalog_seeds_dir: "/app/catalog-seeds"
+  silo_media_dir: "/media"
+  
+  # Database (will be overridden by secrets)
+  silo_db_host: ""
+  silo_db_port: ""
+  silo_db_name: ""
+  silo_db_user: ""
+  silo_db_pass: ""
+  
+  # Redis (will be overridden by secrets)
+  silo_redis_host: ""
+  silo_redis_port: ""
+  silo_redis_pass: ""
+  
+  # Security
+  silo_secret_key: ""
+  silo_cors_origins: "*"
+  silo_trusted_proxy: ""
+  
+  # Hardware transcoding
+  silo_hwtranscode_intel: "true"
+  silo_hwtranscode_nvidia: "false"
+  silo_hwtranscode_arm: "false"
+  silo_hwtranscode_vaapi: "/dev/dri/renderD128"
+  
+  # Logging
+  silo_log_level: "info"
+
+# GPU configuration for hardware transcoding
+gpu:
+  enabled: false
+  device:
+    intel: false
+    nvidia: false
+    arm: false
