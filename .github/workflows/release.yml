@@ -44,8 +44,16 @@ jobs:
           fi
           ls -l *.tgz
 
+      - name: Create tag
+        run: |
+          TAG="charts-$(date -u +%Y%m%d%H%M%S)"
+          git tag "$TAG"
+          git push origin "$TAG"
+          echo "TAG=$TAG" >> "$GITHUB_ENV"
+
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ env.TAG }}
           files: "*.tgz"
           generate_release_notes: true
