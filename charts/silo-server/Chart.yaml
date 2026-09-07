@@ -1,0 +1,15 @@
+# silo-server Helm chart
+# Maintainer: self-hosted
+
+apiVersion: v2
+name: silo-server
+description: A Helm chart for Silo Server - a self-hosted media server for films, series, audiobooks, ebooks, podcasts, and manga
+
+type: application
+version: 0.0.1
+appVersion: "latest"
+home: https://github.com/Silo-Server/silo-server
+sources:
+  - https://github.com/Silo-Server/silo-server
+maintainers:
+  - name: self-hosted

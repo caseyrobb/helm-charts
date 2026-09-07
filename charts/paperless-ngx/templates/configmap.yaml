@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "paperless-ngx.fullname" . }}-config
+  labels:
+    {{- include "paperless-ngx.labels" . | nindent 4 }}
+data:
+  # General settings
+  PAPERLESS_URL: {{ .Values.config.paperless_url | quote }}
+  PAPERLESS_LANG: {{ .Values.config.paperless_lang | quote }}
+  PAPERLESS_TIMEZONE: {{ .Values.config.paperless_timezone | quote }}
+  
+  # Database settings (can be overridden by secret)
+  {{- if .Values.config.paperless_dbhost }}
+  PAPERLESS_DBHOST: {{ .Values.config.paperless_dbhost | quote }}
+  {{- end }}
+  {{- if .Values.config.paperless_dbport }}
+  PAPERLESS_DBPORT: {{ .Values.config.paperless_dbport | quote }}
+  {{- end }}
+  {{- if .Values.config.paperless_dbname }}
+  PAPERLESS_DBNAME: {{ .Values.config.paperless_dbname | quote }}
+  {{- end }}
+  {{- if .Values.config.paperless_dbuser }}
+  PAPERLESS_DBUSER: {{ .Values.config.paperless_dbuser | quote }}
+  {{- end }}
+  
+  # Redis settings (can be overridden by secret)
+  {{- if .Values.config.paperless_redis }}
+  PAPERLESS_REDIS: {{ .Values.config.paperless_redis | quote }}
+  {{- end }}
+  {{- if .Values.config.paperless_redisport }}
+  PAPERLESS_REDISPORT: {{ .Values.config.paperless_redisport | quote }}
+  {{- end }}
+  
+  # Webserver settings
+  PAPERLESS_WEBSERVER_WORKERS: {{ .Values.config.paperless_webserver_workers | quote }}
+  
+  # Directories
+  PAPERLESS_CONSUMPTION_DIR: {{ .Values.config.paperless_consume_dir | quote }}
+  PAPERLESS_EXPORT_DIR: {{ .Values.config.paperless_export_dir | quote }}
+  
+  # Security settings
+  PAPERLESS_TRUSTED_PROXIES: {{ .Values.config.paperless_trusted_proxies | quote }}
+  PAPERLESS_ALLOWED_HOSTS: {{ .Values.config.paperless_allowed_hosts | quote }}
+  
+  {{- if .Values.config.paperless_mailhost }}
+  # Mail settings
+  PAPERLESS_MAILHOST: {{ .Values.config.paperless_mailhost | quote }}
+  PAPERLESS_MAILPORT: {{ .Values.config.paperless_mailport | quote }}
+  PAPERLESS_MAILUSER: {{ .Values.config.paperless_mailuser | quote }}
+  PAPERLESS_MAIL_USE_TLS: {{ .Values.config.paperless_mail_use_tls | quote }}
+  PAPERLESS_MAIL_USE_SSL: {{ .Values.config.paperless_mail_use_ssl | quote }}
+  {{- end }}
