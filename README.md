@@ -27,8 +27,9 @@ helm install <release-name> caseyrobb/<chart-name>
 
 | Chart Name | Description | Version | Status |
 |------------|-------------|---------|--------|
-| [paperless-ngx](https://github.com/paperless-ngx/paperless-ngx) | A document management system that transforms your physical documents into a searchable online archive | 1.0.0 | Ready |
-| [silo-server](https://github.com/Silo-Server/silo-server) | A self-hosted media server for films, series, audiobooks, ebooks, podcasts, and manga | 0.0.1 | Ready |
+| [paperless-ngx](https://github.com/paperless-ngx/paperless-ngx) | A document management system that transforms your physical documents into a searchable online archive | 0.3.2 | Ready |
+| [patchmon](https://github.com/patchmon/patchmon) | Enterprise-grade Linux patch & server management platform with RDP support | 0.1.0 | Ready |
+| [silo-server](https://github.com/Silo-Server/silo-server) | A self-hosted media server for films, series, audiobooks, ebooks, podcasts, and manga | 0.4.1 | Ready |
 
 ## Contributing
 
