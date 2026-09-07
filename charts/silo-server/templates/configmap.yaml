@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "silo-server.fullname" . }}-config
+  labels:
+    {{- include "silo-server.labels" . | nindent 4 }}
+data:
+  # Database settings (can be overridden by secret)
+  {{- if .Values.config.silo_db_host }}
+  SILO_DB_HOST: {{ .Values.config.silo_db_host | quote }}
+  {{- end }}
+  {{- if .Values.config.silo_db_port }}
+  SILO_DB_PORT: {{ .Values.config.silo_db_port | quote }}
+  {{- end }}
+  {{- if .Values.config.silo_db_name }}
+  SILO_DB_NAME: {{ .Values.config.silo_db_name | quote }}
+  {{- end }}
+  {{- if .Values.config.silo_db_user }}
+  SILO_DB_USER: {{ .Values.config.silo_db_user | quote }}
+  {{- end }}
+  
+  # Redis settings (can be overridden by secret)
+  {{- if .Values.config.silo_redis_host }}
+  SILO_REDIS_HOST: {{ .Values.config.silo_redis_host | quote }}
+  {{- end }}
+  {{- if .Values.config.silo_redis_port }}
+  SILO_REDIS_PORT: {{ .Values.config.silo_redis_port | quote }}
+  {{- end }}
+  
+  # Webserver settings
+  SILO_LISTEN: {{ .Values.config.silo_listen | quote }}
+  SILO_URL: {{ .Values.config.silo_url | quote }}
+  SILO_HOST: {{ .Values.config.silo_host | quote }}
+  SILO_PORT: {{ .Values.config.silo_port | quote }}
+  SILO_MEDIA_PORT: {{ .Values.config.silo_media_port | quote }}
+  
+  # Directories
+  SILO_TRANSCODE_DIR: {{ .Values.config.silo_transcode_dir | quote }}
+  SILO_PLUGINS_DIR: {{ .Values.config.silo_plugins_dir | quote }}
+  SILO_CATALOG_SEEDS_DIR: {{ .Values.config.silo_catalog_seeds_dir | quote }}
+  SILO_MEDIA_DIR: {{ .Values.config.silo_media_dir | quote }}
+  
+  # Hardware transcoding
+  SILO_HWTRANSCODE_INTEL: {{ .Values.config.silo_hwtranscode_intel | quote }}
+  SILO_HWTRANSCODE_VAAPI: {{ .Values.config.silo_hwtranscode_vaapi | quote }}
+  SILO_CORS_ORIGINS: {{ .Values.config.silo_cors_origins | quote }}
+  
+  # Logging
+  SILO_LOG_LEVEL: {{ .Values.config.silo_log_level | quote }}
