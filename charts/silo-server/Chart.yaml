@@ -3,7 +3,7 @@ name: silo-server
 description: A Helm chart for Silo Server - a self-hosted media server for films, series, audiobooks, ebooks, podcasts, and manga
 
 type: application
-version: 0.2.0
+version: 0.3.0
 appVersion: "latest"
 home: https://github.com/Silo-Server/silo-server
 sources:
