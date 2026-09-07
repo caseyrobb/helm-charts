@@ -5,12 +5,12 @@ on:
     branches:
       - master
     paths:
-      - 'charts/**'
+      - "charts/**"
   pull_request:
     branches:
       - master
     paths:
-      - 'charts/**'
+      - "charts/**"
 
 jobs:
   release:
@@ -25,18 +25,27 @@ jobs:
       - name: Set up Helm
         uses: azure/setup-helm@v4
         with:
-          version: 'v3.16.0'
+          version: "v3.16.0"
 
       - name: Package charts
         run: |
+          shopt -s nullglob
+          packaged=0
           for chart_dir in charts/*/; do
-            if [ -f "${chart_dir}Chart.yaml" ]; then
+            if [[ -f "${chart_dir}Chart.yaml" ]]; then
+              echo "Packaging ${chart_dir}"
               helm package "${chart_dir}"
+              packaged=$((packaged + 1))
             fi
           done
+          if [[ "${packaged}" -eq 0 ]]; then
+            echo "No charts found to package" >&2
+            exit 1
+          fi
+          ls -l *.tgz
 
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
-          files: '*.tgz'
+          files: "*.tgz"
           generate_release_notes: true
