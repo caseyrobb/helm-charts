@@ -1,0 +1,48 @@
+{{- if .Values.guacd.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "patchmon.fullname" . }}-guacd
+  labels:
+    {{- include "patchmon.labels" . | nindent 4 }}
+    app.kubernetes.io/component: guacd
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "patchmon.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: guacd
+  template:
+    metadata:
+      labels:
+        {{- include "patchmon.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: guacd
+    spec:
+      securityContext:
+        {{- toYaml .Values.guacd.securityContext | nindent 8 }}
+      containers:
+        - name: guacd
+          image: "{{ .Values.guacd.image.repository }}:{{ .Values.guacd.image.tag }}"
+          ports:
+            - name: guacd
+              containerPort: 4822
+              protocol: TCP
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            {{- toYaml .Values.guacd.resources | nindent 12 }}
+          livenessProbe:
+            tcpSocket:
+              port: guacd
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: guacd
+            initialDelaySeconds: 5
+            periodSeconds: 5
+{{- end }}

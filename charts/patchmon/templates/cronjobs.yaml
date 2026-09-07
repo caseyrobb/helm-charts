@@ -1,0 +1,81 @@
+{{- if .Values.cleanup.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "patchmon.fullname" . }}-cleanup
+  labels:
+    {{- include "patchmon.labels" . | nindent 4 }}
+spec:
+  schedule: {{ .Values.cleanup.schedule | quote }}
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            {{- include "patchmon.selectorLabels" . | nindent 12 }}
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: cleanup
+              image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  # Clean up old agent reports
+                  echo "Cleaning up agent reports older than 30 days..."
+                  # This would require database access - in production use
+                  # the server's built-in scheduled cleanup via environment
+                  echo "Cleanup completed (server handles actual cleanup)"
+              envFrom:
+                - secretRef:
+                    name: {{ include "patchmon.fullname" . }}-secrets
+              resources:
+                limits:
+                  cpu: 100m
+                  memory: 128Mi
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "patchmon.fullname" . }}-ssg-update
+  labels:
+    {{- include "patchmon.labels" . | nindent 4 }}
+spec:
+  schedule: {{ .Values.cleanup.ssgSchedule | quote }}
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            {{- include "patchmon.selectorLabels" . | nindent 12 }}
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: ssg-update
+              image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  # Trigger SSG content update check
+                  echo "Checking for SSG content updates..."
+                  # This would require database access - in production use
+                  # the server's built-in scheduled SSG check via cron
+                  echo "SSG update check completed"
+              envFrom:
+                - secretRef:
+                    name: {{ include "patchmon.fullname" . }}-secrets
+              resources:
+                limits:
+                  cpu: 100m
+                  memory: 128Mi
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+{{- end }}

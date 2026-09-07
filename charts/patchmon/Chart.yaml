@@ -1,0 +1,14 @@
+apiVersion: v2
+name: patchmon
+description: Enterprise-grade Linux patch & server management platform
+type: application
+version: 0.1.0
+appVersion: "2.1.3"
+keywords:
+  - patch-management
+  - server-management
+  - rdp
+  - guacamole
+maintainers:
+  - name: PatchMon Team
+    url: https://github.com/patchmon/patchmon

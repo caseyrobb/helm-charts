@@ -1,122 +1,132 @@
-{{/* vim: set filetype=mustache: */}}
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "paperless-ngx.name" -}}
-{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
-{{- end }}
+{{- define "paperless.name" -}}
+{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
 
 {{/*
-Create a default fully qualified app name.
-We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
-If release name contains chart name it will be used as a full name.
+Fully qualified app name.
 */}}
-{{- define "paperless-ngx.fullname" -}}
-{{- if .Values.fullnameOverride }}
-{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
-{{- else }}
-{{- $name := default .Chart.Name .Values.nameOverride }}
-{{- if contains $name .Release.Name }}
-{{- .Release.Name | trunc 63 | trimSuffix "-" }}
-{{- else }}
-{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" }}
+{{- define "paperless.fullname" -}}
+{{- if .Values.fullnameOverride -}}
+{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- $name := default .Chart.Name .Values.nameOverride -}}
+{{- if contains $name .Release.Name -}}
+{{- .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{- define "paperless.chart" -}}
+{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{- define "paperless.labels" -}}
+helm.sh/chart: {{ include "paperless.chart" . }}
+{{ include "paperless.selectorLabels" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
-{{- end }}
-{{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end -}}
+
+{{- define "paperless.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "paperless.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end -}}
+
+{{- define "paperless.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create -}}
+{{- default (include "paperless.fullname" .) .Values.serviceAccount.name -}}
+{{- else -}}
+{{- default "default" .Values.serviceAccount.name -}}
+{{- end -}}
+{{- end -}}
 
 {{/*
-Create chart name and version as used by the chart label.
+Names of related resources.
 */}}
-{{- define "paperless-ngx.chart" -}}
-{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
-{{- end }}
+{{- define "paperless.secretName" -}}
+{{ include "paperless.fullname" . }}-env
+{{- end -}}
+
+{{- define "paperless.configMapName" -}}
+{{ include "paperless.fullname" . }}-config
+{{- end -}}
+
+{{- define "paperless.cnpg.clusterName" -}}
+{{- default (printf "%s-pg" (include "paperless.fullname" .)) .Values.cnpg.clusterName -}}
+{{- end -}}
 
 {{/*
-Create the name of the service account to use
+Name of the CNPG-generated app credentials secret. CNPG creates
+`<cluster>-app` with `username` and `password` keys.
 */}}
-{{- define "paperless-ngx.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create }}
-{{- default (include "paperless-ngx.fullname" .) .Values.serviceAccount.name }}
-{{- else }}
-{{- default "default" .Values.serviceAccount.name }}
-{{- end }}
-{{- end }}
+{{- define "paperless.cnpg.appSecretName" -}}
+{{- if .Values.cnpg.bootstrapSecret -}}
+{{- .Values.cnpg.bootstrapSecret -}}
+{{- else -}}
+{{- printf "%s-app" (include "paperless.cnpg.clusterName" .) -}}
+{{- end -}}
+{{- end -}}
 
 {{/*
-Create the name of the PostgreSQL resource
+Resolved DB host. CNPG exposes `<cluster>-rw` as the primary endpoint.
 */}}
-{{- define "paperless-ngx.postgresql.host" -}}
-{{- if .Values.postgresql.enabled }}
-{{- if .Values.postgresql.host }}
-{{- .Values.postgresql.host }}
-{{- else }}
-{{- printf "%s-postgresql" (include "paperless-ngx.fullname" .) }}
-{{- end }}
-{{- else }}
-{{- .Values.postgresql.host | required "postgresql.host is required" }}
-{{- end }}
-{{- end }}
+{{- define "paperless.dbHost" -}}
+{{- if .Values.cnpg.enabled -}}
+{{- printf "%s-rw" (include "paperless.cnpg.clusterName" .) -}}
+{{- else if .Values.externalDatabase.enabled -}}
+{{- .Values.externalDatabase.host -}}
+{{- end -}}
+{{- end -}}
+
+{{- define "paperless.dbPort" -}}
+{{- if .Values.cnpg.enabled -}}
+5432
+{{- else if .Values.externalDatabase.enabled -}}
+{{- .Values.externalDatabase.port | default 5432 -}}
+{{- end -}}
+{{- end -}}
+
+{{- define "paperless.dbName" -}}
+{{- if .Values.cnpg.enabled -}}
+{{- .Values.cnpg.database -}}
+{{- else if .Values.externalDatabase.enabled -}}
+{{- .Values.externalDatabase.database -}}
+{{- end -}}
+{{- end -}}
+
+{{- define "paperless.dbEngine" -}}
+{{- if or .Values.cnpg.enabled (and .Values.externalDatabase.enabled (eq (.Values.database.engine | default "postgresql") "postgresql")) -}}
+postgresql
+{{- else if and .Values.externalDatabase.enabled (eq .Values.database.engine "mariadb") -}}
+mariadb
+{{- else -}}
+sqlite
+{{- end -}}
+{{- end -}}
 
 {{/*
-Create the name of the Redis resource
+Resolved Redis URL. Returns the in-cluster Bitnami service when enabled,
+otherwise the user-supplied URL (which may also come from existingSecret).
 */}}
-{{- define "paperless-ngx.redis.host" -}}
-{{- if .Values.redis.enabled }}
-{{- if .Values.redis.host }}
-{{- .Values.redis.host }}
-{{- else }}
-{{- printf "%s-redis" (include "paperless-ngx.fullname" .) }}
-{{- end }}
-{{- else }}
-{{- .Values.redis.host | required "redis.host is required" }}
-{{- end }}
-{{- end }}
+{{- define "paperless.redisUrl" -}}
+{{- if .Values.redis.enabled -}}
+{{- printf "redis://%s-redis-master:6379" .Release.Name -}}
+{{- else if .Values.externalRedis.enabled -}}
+{{- .Values.externalRedis.url -}}
+{{- end -}}
+{{- end -}}
 
-{{/*
-Generate the database connection string
-*/}}
-{{- define "paperless-ngx.database.url" -}}
-{{- if .Values.postgresql.enabled }}
-{{- printf "postgresql://%s:%s@%s:%s/%s" .Values.postgresql.username (include "paperless-ngx.postgresql.password" .) (include "paperless-ngx.postgresql.host" .) (default "5432" .Values.postgresql.port) .Values.postgresql.database }}
-{{- else }}
-{{- required "postgresql settings are required when postgresql.enabled is false" .Values.postgresql.database }}
-{{- end }}
-{{- end }}
+{{- define "paperless.gotenberg.fullname" -}}
+{{ include "paperless.fullname" . }}-gotenberg
+{{- end -}}
 
-{{/*
-Generate the database password from secret or default value
-*/}}
-{{- define "paperless-ngx.postgresql.password" -}}
-{{- if .Values.postgresql.existingSecret }}
-{{- printf "{{{{ index .Values.postgresql.existingSecret }}}}" }}
-{{- else }}
-{{- .Values.postgresql.password | required "postgresql.password is required" | b64enc }}
-{{- end }}
-{{- end }}
-
-{{/*
-Generate the redis password from secret or default value
-*/}}
-{{- define "paperless-ngx.redis.password" -}}
-{{- if .Values.redis.existingSecret }}
-{{- printf "{{{{ index .Values.redis.existingSecret }}}}" }}
-{{- else }}
-{{- .Values.redis.password | b64enc }}
-{{- end }}
-{{- end }}
-
-{{/*
-Generate the redis connection string
-*/}}
-{{- define "paperless-ngx.redis.url" -}}
-{{- if .Values.redis.enabled }}
-{{- $password := include "paperless-ngx.redis.password" . }}
-{{- if $password }}
-{{- printf "redis://:%s@%s:%s/0" $password (include "paperless-ngx.redis.host" .) (default "6379" .Values.redis.port) }}
-{{- else }}
-{{- printf "redis://%s:%s/0" (include "paperless-ngx.redis.host" .) (default "6379" .Values.redis.port) }}
-{{- end }}
-{{- else }}
-{{- required "redis settings are required when redis.enabled is false" .Values.redis.host }}
-{{- end }}
-{{- end }}
+{{- define "paperless.tika.fullname" -}}
+{{ include "paperless.fullname" . }}-tika
+{{- end -}}

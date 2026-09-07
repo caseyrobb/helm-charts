@@ -1,168 +1,78 @@
 # paperless-ngx
 
-[paperless-ngx](https://github.com/paperless-ngx/paperless-ngx) is a document management system that transforms your physical documents into a searchable online archive.
+A Helm chart for [Paperless-ngx](https://docs.paperless-ngx.com/).
+
+## TL;DR
+
+```bash
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm dependency update charts/paperless-ngx
+helm install paperless charts/paperless-ngx
+```
 
 ## Prerequisites
 
-- Kubernetes 1.16+
-- Helm 3.2+
-- PV provisioner support in the underlying infrastructure
+- Kubernetes 1.25+
+- Helm 3.10+
+- For the default DB setup: the [CloudNativePG operator](https://cloudnative-pg.io/documentation/current/installation_upgrade/)
+  installed in the cluster.
+- A default StorageClass (or set one explicitly in values).
 
-## Installation
+## Database options
 
-### Add the repository
+Exactly one DB backend should be active. The chart supports three:
 
-```bash
-helm repo add caseyrobb https://caseyrobb.github.io/helm-charts
-helm repo update
-```
+| Mode | Set values |
+| --- | --- |
+| CloudNativePG (default) | `cnpg.enabled=true` |
+| External Postgres / MariaDB | `cnpg.enabled=false`, `externalDatabase.enabled=true`, populate `externalDatabase.*` or `externalDatabase.existingSecret` |
+| Built-in SQLite (eval only) | `cnpg.enabled=false`, `externalDatabase.enabled=false` |
 
-### Install the chart
+CNPG creates a Secret named `<cluster>-app` with `username`/`password` keys; the
+chart wires those into `PAPERLESS_DBUSER` / `PAPERLESS_DBPASS` automatically.
 
-```bash
-helm install my-paperless caseyrobb/paperless-ngx
-```
+## Broker
 
-### Install with custom values
+Bitnami Redis ships as a subchart and is enabled by default. To use an external
+broker, set `redis.enabled=false` and either `externalRedis.url` or an
+`externalRedis.existingSecret`.
 
-```bash
-helm install my-paperless caseyrobb/paperless-ngx \
-  --set postgresql.password=secretpassword \
-  --set config.paperless_secret_key=mysecretkey
-```
+## Persistence
 
-## Configuration
+Four PVCs are created by default (`data`, `media`, `consume`, `export`).
+Override sizes, storage classes, or point at pre-existing PVCs via
+`persistence.<name>.existingClaim`. Default access mode is `ReadWriteOnce`;
+running more than one replica requires RWX volumes and disabling the embedded
+consumer in Paperless.
 
-The following table lists the configurable parameters of the paperless-ngx chart and their default values.
+## Common installs
 
-| Parameter | Description | Default |
-|-----------|-------------|---------|
-| `replicaCount` | Number of replicas | `1` |
-| `image.repository` | Image repository | `ghcr.io/paperless-ngx/paperless-ngx` |
-| `image.tag` | Image tag | `3.1.3` |
-| `image.pullPolicy` | Image pull policy | `IfNotPresent` |
-| `service.type` | Service type | `ClusterIP` |
-| `service.port` | Service port | `8000` |
-| `postgresql.enabled` | Enable embedded PostgreSQL | `true` |
-| `postgresql.host` | External PostgreSQL host | `""` |
-| `postgresql.port` | PostgreSQL port | `5432` |
-| `postgresql.database` | PostgreSQL database | `paperless` |
-| `postgresql.username` | PostgreSQL username | `paperless` |
-| `postgresql.password` | PostgreSQL password | `""` |
-| `redis.enabled` | Enable embedded Redis | `true` |
-| `redis.host` | External Redis host | `""` |
-| `redis.port` | Redis port | `6379` |
-| `persistence.enabled` | Enable persistence | `true` |
-| `persistence.size` | PVC size | `10Gi` |
-| `resources.limits.cpu` | CPU limit | `500m` |
-| `resources.limits.memory` | Memory limit | `512Mi` |
-| `config.paperless_url` | Paperless URL | `http://localhost:8000` |
-| `config.paperless_secret_key` | Django secret key | Generated randomly |
-
-### Ingress Configuration
-
-```yaml
-ingress:
-  enabled: true
-  className: nginx
-  hosts:
-    - host: paperless.example.com
-      paths:
-        - path: /
-          pathType: Prefix
-```
-
-### Custom Storage Class
-
-```yaml
-persistence:
-  storageClass: "premium-ssd"
-  size: 50Gi
-```
-
-### External Database
-
-```yaml
-postgresql:
-  enabled: false
-  host: my-postgres.example.com
-  port: 5432
-  database: paperless
-  username: paperless
-  password: "mypassword"
-  existingSecret: "paperless-db-secret"
-  existingSecretKey: "password"
-```
-
-### Mail Configuration
-
-```yaml
-config:
-  paperless_mailhost: "smtp.example.com"
-  paperless_mailport: 587
-  paperless_mailuser: "paperless@example.com"
-  paperless_mailpassword: "myappassword"
-  paperless_mail_use_tls: "true"
-```
-
-## Upgrade
+External Postgres, no Redis subchart:
 
 ```bash
-helm upgrade my-paperless caseyrobb/paperless-ngx -f values.yaml
+helm install paperless charts/paperless-ngx \
+  --set cnpg.enabled=false \
+  --set externalDatabase.enabled=true \
+  --set externalDatabase.host=postgres.prod.svc \
+  --set externalDatabase.user=paperless \
+  --set externalDatabase.existingSecret=paperless-db \
+  --set redis.enabled=false \
+  --set externalRedis.enabled=true \
+  --set externalRedis.url=redis://redis.prod.svc:6379
 ```
 
-## Uninstall
+With an ingress:
 
 ```bash
-helm uninstall my-paperless
+helm install paperless charts/paperless-ngx \
+  --set ingress.enabled=true \
+  --set ingress.className=nginx \
+  --set ingress.hosts[0].host=paperless.example.com \
+  --set ingress.hosts[0].paths[0].path=/ \
+  --set ingress.hosts[0].paths[0].pathType=Prefix \
+  --set paperless.url=https://paperless.example.com
 ```
 
-To delete the PVCs:
+## Values
 
-```bash
-kubectl delete pvc -l app.kubernetes.io/name=paperless-ngx
-```
-
-## Troubleshooting
-
-### Pods not starting
-
-Check logs:
-
-```bash
-kubectl logs -l app.kubernetes.io/name=paperless-ngx
-```
-
-### Database connection issues
-
-Verify PostgreSQL is running:
-
-```bash
-kubectl get pods -l app.kubernetes.io/name=postgresql
-```
-
-Check environment variables in the pod:
-
-```bash
-kubectl exec -it <pod-name> -- env | grep PAPERLESS_DB
-```
-
-### Memory issues
-
-Increase resources:
-
-```yaml
-resources:
-  limits:
-    memory: 1Gi
-  requests:
-    memory: 512Mi
-```
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+See [`values.yaml`](./values.yaml) for the complete list and inline docs.

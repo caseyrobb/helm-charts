@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "patchmon.fullname" . }}-config
+  labels:
+    {{- include "patchmon.labels" . | nindent 4 }}
+data:
+  CORS_ORIGIN: {{ .Values.config.corsOrigin | quote }}
+  JWT_EXPIRES_IN: "1h"
+  POSTGRES_HOST: {{ include "patchmon.fullname" . }}-postgresql
+  POSTGRES_PORT: "5432"
+  {{- if .Values.postgresql.auth.username }}
+  POSTGRES_USER: {{ .Values.postgresql.auth.username | quote }}
+  {{- else }}
+  POSTGRES_USER: patchmon_user
+  {{- end }}
+  {{- if .Values.postgresql.auth.database }}
+  POSTGRES_DB: {{ .Values.postgresql.auth.database | quote }}
+  {{- else }}
+  POSTGRES_DB: patchmon_db
+  {{- end }}
+  REDIS_HOST: {{ include "patchmon.fullname" . }}-redis-master
+  REDIS_PORT: "6379"
+  REDIS_DB: "0"
+  {{- if .Values.guacd.enabled }}
+  GUACD_ADDRESS: {{ include "patchmon.fullname" . }}-guacd:4822
+  {{- else }}
+  GUACD_ADDRESS: {{ include "patchmon.fullname" . }}-guacd:4822
+  {{- end }}
+  PORT: {{ .Values.containerPort | quote }}
+  {{- if .Values.server.env }}
+  {{- toYaml .Values.server.env | nindent 2 }}
+  {{- end }}

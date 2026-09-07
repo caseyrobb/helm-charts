@@ -1,39 +1,89 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "paperless-ngx.fullname" . }}
+  name: {{ include "paperless.fullname" . }}
   labels:
-    {{- include "paperless-ngx.labels" . | nindent 4 }}
+    {{- include "paperless.labels" . | nindent 4 }}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
-  {{- end }}
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
-      {{- include "paperless-ngx.selectorLabels" . | nindent 6 }}
+      {{- include "paperless.selectorLabels" . | nindent 6 }}
   template:
     metadata:
+      labels:
+        {{- include "paperless.selectorLabels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
       annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
         {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
-        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
-      labels:
-        {{- include "paperless-ngx.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "paperless-ngx.serviceAccountName" . }}
+      serviceAccountName: {{ include "paperless.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
-      containers:
-        - name: {{ .Chart.Name }}
+      {{- if or .Values.cnpg.enabled .Values.externalDatabase.enabled .Values.redis.enabled .Values.externalRedis.enabled }}
+      initContainers:
+        {{- if or .Values.cnpg.enabled .Values.externalDatabase.enabled }}
+        - name: wait-for-db
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - |
+              echo "Waiting for database at $PAPERLESS_DBHOST:$PAPERLESS_DBPORT..."
+              until nc -z "$PAPERLESS_DBHOST" "$PAPERLESS_DBPORT"; do sleep 2; done
+              echo "Database reachable."
+          envFrom:
+            - configMapRef:
+                name: {{ include "paperless.configMapName" . }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        {{- end }}
+        {{- if or .Values.redis.enabled .Values.externalRedis.enabled }}
+        - name: wait-for-redis
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - |
+              # Parse host:port from PAPERLESS_REDIS, stripping scheme/credentials/path
+              url="${PAPERLESS_REDIS#redis://}"
+              url="${url#rediss://}"
+              hostport="${url##*@}"
+              hostport="${hostport%%/*}"
+              host="${hostport%%:*}"
+              port="${hostport##*:}"
+              [ "$host" = "$port" ] && port=6379
+              echo "Waiting for redis at $host:$port..."
+              until nc -z "$host" "$port"; do sleep 2; done
+              echo "Redis reachable."
+          env:
+            - name: PAPERLESS_REDIS
+              {{- if and .Values.externalRedis.enabled .Values.externalRedis.existingSecret }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.externalRedis.existingSecret }}
+                  key: {{ .Values.externalRedis.existingSecretKey }}
+              {{- else }}
+              value: {{ include "paperless.redisUrl" . | quote }}
+              {{- end }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+        {{- end }}
+      {{- end }}
+      containers:
+        - name: paperless
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
@@ -41,111 +91,130 @@ spec:
               protocol: TCP
           envFrom:
             - configMapRef:
-                name: {{ include "paperless-ngx.fullname" . }}-config
-            - secretRef:
-                name: {{ include "paperless-ngx.fullname" . }}-secret
+                name: {{ include "paperless.configMapName" . }}
           env:
-            # Database configuration
-            - name: PAPERLESS_DBHOST
-              value: {{ include "paperless-ngx.postgresql.host" . | quote }}
-            - name: PAPERLESS_DBPORT
-              value: {{ default "5432" .Values.postgresql.port | quote }}
-            - name: PAPERLESS_DBNAME
-              value: {{ .Values.postgresql.database | quote }}
-            - name: PAPERLESS_DBUSER
-              value: {{ .Values.postgresql.username | quote }}
-            {{- if .Values.postgresql.existingSecret }}
-            - name: PAPERLESS_DBPASS
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.postgresql.existingSecret }}
-                  key: {{ default "postgresql-password" .Values.postgresql.existingSecretKey | quote }}
-            {{- else }}
-            - name: PAPERLESS_DBPASS
-              valueFrom:
-                secretKeyRef:
-                  name: {{ include "paperless-ngx.fullname" . }}-secret
-                  key: postgresql-password
-            {{- end }}
-            # Redis configuration
+            - name: USERMAP_UID
+              value: {{ .Values.podSecurityContext.runAsUser | default 1000 | quote }}
+            - name: USERMAP_GID
+              value: {{ .Values.podSecurityContext.runAsGroup | default 1000 | quote }}
+            {{- /* Redis URL */}}
             - name: PAPERLESS_REDIS
-              value: {{ include "paperless-ngx.redis.url" . | quote }}
-            # Webserver workers
-            - name: PAPERLESS_WEBSERVER_WORKERS
-              value: {{ .Values.config.paperless_webserver_workers | quote }}
-            # Secret key
+              {{- if and .Values.externalRedis.enabled .Values.externalRedis.existingSecret }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.externalRedis.existingSecret }}
+                  key: {{ .Values.externalRedis.existingSecretKey }}
+              {{- else }}
+              value: {{ include "paperless.redisUrl" . | quote }}
+              {{- end }}
+            {{- /* DB credentials */}}
+            {{- if .Values.cnpg.enabled }}
+            - name: PAPERLESS_DBUSER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "paperless.cnpg.appSecretName" . }}
+                  key: username
+            - name: PAPERLESS_DBPASS
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "paperless.cnpg.appSecretName" . }}
+                  key: password
+            {{- else if .Values.externalDatabase.enabled }}
+            {{- if .Values.externalDatabase.existingSecret }}
+            - name: PAPERLESS_DBUSER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.externalDatabase.existingSecret }}
+                  key: {{ .Values.externalDatabase.existingSecretUserKey }}
+            - name: PAPERLESS_DBPASS
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.externalDatabase.existingSecret }}
+                  key: {{ .Values.externalDatabase.existingSecretPasswordKey }}
+            {{- else }}
+            - name: PAPERLESS_DBUSER
+              value: {{ .Values.externalDatabase.user | quote }}
+            - name: PAPERLESS_DBPASS
+              value: {{ .Values.externalDatabase.password | quote }}
+            {{- end }}
+            {{- end }}
+            {{- /* SECRET_KEY */}}
             - name: PAPERLESS_SECRET_KEY
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "paperless-ngx.fullname" . }}-secret
-                  key: secret-key
-            # URL settings
-            - name: PAPERLESS_URL
-              value: {{ .Values.config.paperless_url | quote }}
-            # Language and timezone
-            - name: PAPERLESS_LANG
-              value: {{ .Values.config.paperless_lang | quote }}
-            - name: PAPERLESS_TIMEZONE
-              value: {{ .Values.config.paperless_timezone | quote }}
-            # Directories
-            - name: PAPERLESS_CONSUMPTION_DIR
-              value: {{ .Values.config.paperless_consume_dir | quote }}
-            - name: PAPERLESS_EXPORT_DIR
-              value: {{ .Values.config.paperless_export_dir | quote }}
-            # Security
-            - name: PAPERLESS_TRUSTED_PROXIES
-              value: {{ .Values.config.paperless_trusted_proxies | quote }}
-            - name: PAPERLESS_ALLOWED_HOSTS
-              value: {{ .Values.config.paperless_allowed_hosts | quote }}
-            {{- if .Values.config.paperless_mailhost }}
-            # Mail configuration
-            - name: PAPERLESS_MAILHOST
-              value: {{ .Values.config.paperless_mailhost | quote }}
-            - name: PAPERLESS_MAILPORT
-              value: {{ .Values.config.paperless_mailport | quote }}
-            - name: PAPERLESS_MAILUSER
-              value: {{ .Values.config.paperless_mailuser | quote }}
-            - name: PAPERLESS_MAILPASSWORD
+                  name: {{ .Values.secretKey.existingSecret | default (include "paperless.secretName" .) }}
+                  key: {{ .Values.secretKey.existingSecretKey | default "PAPERLESS_SECRET_KEY" }}
+            {{- /* Admin bootstrap */}}
+            {{- if .Values.admin.existingSecret }}
+            - name: PAPERLESS_ADMIN_USER
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "paperless-ngx.fullname" . }}-secret
-                  key: mail-password
-            - name: PAPERLESS_MAIL_USE_TLS
-              value: {{ .Values.config.paperless_mail_use_tls | quote }}
-            - name: PAPERLESS_MAIL_USE_SSL
-              value: {{ .Values.config.paperless_mail_use_ssl | quote }}
+                  name: {{ .Values.admin.existingSecret }}
+                  key: {{ .Values.admin.existingSecretUserKey }}
+            - name: PAPERLESS_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.admin.existingSecret }}
+                  key: {{ .Values.admin.existingSecretPasswordKey }}
+            {{- else }}
+            - name: PAPERLESS_ADMIN_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "paperless.secretName" . }}
+                  key: PAPERLESS_ADMIN_USER
+            - name: PAPERLESS_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "paperless.secretName" . }}
+                  key: PAPERLESS_ADMIN_PASSWORD
+            {{- if .Values.admin.email }}
+            - name: PAPERLESS_ADMIN_MAIL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "paperless.secretName" . }}
+                  key: PAPERLESS_ADMIN_MAIL
             {{- end }}
+            {{- end }}
+          {{- if .Values.startupProbe.enabled }}
+          startupProbe:
+            {{- omit .Values.startupProbe "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+          {{- if .Values.livenessProbe.enabled }}
+          livenessProbe:
+            {{- omit .Values.livenessProbe "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+          {{- if .Values.readinessProbe.enabled }}
+          readinessProbe:
+            {{- omit .Values.readinessProbe "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
           volumeMounts:
+            {{- if .Values.persistence.data.enabled }}
             - name: data
               mountPath: /usr/src/paperless/data
+            {{- end }}
+            {{- if .Values.persistence.media.enabled }}
             - name: media
               mountPath: /usr/src/paperless/media
-            {{- if .Values.persistence.subPath }}
+            {{- end }}
+            {{- if .Values.persistence.consume.enabled }}
             - name: consume
               mountPath: /usr/src/paperless/consume
             {{- end }}
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+            {{- if .Values.persistence.export.enabled }}
+            - name: export
+              mountPath: /usr/src/paperless/export
+            {{- end }}
       volumes:
-        {{- if .Values.persistence.existingClaim }}
-        - name: data
+        {{- range $name, $cfg := .Values.persistence }}
+        {{- if $cfg.enabled }}
+        - name: {{ $name }}
           persistentVolumeClaim:
-            claimName: {{ .Values.persistence.existingClaim }}
-        - name: media
-          persistentVolumeClaim:
-            claimName: {{ .Values.persistence.existingClaim }}
-        {{- else }}
-        - name: data
-          persistentVolumeClaim:
-            claimName: {{ include "paperless-ngx.fullname" . }}-data
-        - name: media
-          persistentVolumeClaim:
-            claimName: {{ include "paperless-ngx.fullname" . }}-media
+            claimName: {{ $cfg.existingClaim | default (printf "%s-%s" (include "paperless.fullname" $) $name) }}
         {{- end }}
-        {{- if not .Values.persistence.subPath }}
-        - name: consume
-          persistentVolumeClaim:
-            claimName: {{ include "paperless-ngx.fullname" . }}-consume
         {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:

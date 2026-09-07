@@ -1,0 +1,36 @@
+{{- if .Values.postgresql.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "patchmon.fullname" . }}-postgresql
+  labels:
+    {{- include "patchmon.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - {{ .Values.persistence.postgresql.accessMode }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.postgresql.size }}
+  {{- if .Values.persistence.postgresql.storageClass }}
+  storageClassName: {{ .Values.persistence.postgresql.storageClass }}
+  {{- end }}
+{{- end }}
+
+---
+{{- if .Values.redis.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "patchmon.fullname" . }}-redis
+  labels:
+    {{- include "patchmon.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - {{ .Values.persistence.redis.accessMode }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.redis.size }}
+  {{- if .Values.persistence.redis.storageClass }}
+  storageClassName: {{ .Values.persistence.redis.storageClass }}
+  {{- end }}
+{{- end }}

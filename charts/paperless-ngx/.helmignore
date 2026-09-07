@@ -1,26 +1,18 @@
 # Patterns to ignore when building packages.
 .DS_Store
-
-# VCS
 .git/
 .gitignore
-
-# Backup / editor
+.bzr/
+.bzrignore
+.hg/
+.hgignore
+.svn/
 *.swp
 *.bak
 *.tmp
+*.orig
 *~
 .project
 .idea/
+*.tmproj
 .vscode/
-
-# Env / secrets
-.env
-.env.*
-
-# Tests / docs you don't want in the package
-tests/
-test/
-LICENSE
-CONTRIBUTING.md
-CHANGELOG.md

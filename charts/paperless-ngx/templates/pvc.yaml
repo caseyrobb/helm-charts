@@ -1,57 +1,23 @@
-{{- if and .Values.persistence.enabled (not .Values.persistence.existingClaim) }}
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: {{ include "paperless-ngx.fullname" . }}-data
-  labels:
-    {{- include "paperless-ngx.labels" . | nindent 4 }}
-spec:
-  accessModes:
-    {{- range .Values.persistence.accessModes }}
-    - {{ . | quote }}
-    {{- end }}
-  {{- if .Values.persistence.storageClass }}
-  storageClassName: {{ .Values.persistence.storageClass }}
-  {{- end }}
-  resources:
-    requests:
-      storage: {{ .Values.persistence.size | quote }}
+{{- range $name, $cfg := .Values.persistence }}
+{{- if and $cfg.enabled (not $cfg.existingClaim) }}
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ include "paperless-ngx.fullname" . }}-media
+  name: {{ include "paperless.fullname" $ }}-{{ $name }}
   labels:
-    {{- include "paperless-ngx.labels" . | nindent 4 }}
+    {{- include "paperless.labels" $ | nindent 4 }}
+    app.kubernetes.io/component: {{ $name }}
 spec:
   accessModes:
-    {{- range .Values.persistence.accessModes }}
-    - {{ . | quote }}
+    {{- range $cfg.accessModes }}
+    - {{ . }}
     {{- end }}
-  {{- if .Values.persistence.storageClass }}
-  storageClassName: {{ .Values.persistence.storageClass }}
+  {{- if $cfg.storageClass }}
+  storageClassName: {{ $cfg.storageClass | quote }}
   {{- end }}
   resources:
     requests:
-      storage: {{ .Values.persistence.size | quote }}
-{{- if not .Values.persistence.subPath }}
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: {{ include "paperless-ngx.fullname" . }}-consume
-  labels:
-    {{- include "paperless-ngx.labels" . | nindent 4 }}
-spec:
-  accessModes:
-    {{- range .Values.persistence.accessModes }}
-    - {{ . | quote }}
-    {{- end }}
-  {{- if .Values.persistence.storageClass }}
-  storageClassName: {{ .Values.persistence.storageClass }}
-  {{- end }}
-  resources:
-    requests:
-      storage: {{ .Values.persistence.size | quote }}
+      storage: {{ $cfg.size }}
 {{- end }}
 {{- end }}

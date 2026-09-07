@@ -1,0 +1,149 @@
+# Default values for patchmon Helm chart
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# Image settings
+image:
+  repository: ghcr.io/patchmon/patchmon-server
+  tag: latest
+  pullPolicy: IfNotPresent
+
+# Container port
+containerPort: 3000
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 3000
+  annotations: {}
+  # labels: {}
+
+# Ingress configuration
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: patchmon.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+# Server deployment
+server:
+  replicas: 1
+  podAnnotations: {}
+  podSecurityContext: {}
+  securityContext: {}
+  resources:
+    limits:
+      cpu: 1
+      memory: 2Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  env: {}
+  # Additional environment variables from secrets or configmaps
+  envFrom: []
+  # volumes: []
+  # volumeMounts: {}
+
+# PostgreSQL sub-chart
+postgresql:
+  enabled: true
+  image:
+    registry: docker.io
+    repository: bitnami/postgresql
+    tag: 17-debian-12
+  auth:
+    username: patchmon_user
+    password: patchmon_password
+    database: patchmon_db
+  primary:
+    resources:
+      limits:
+        cpu: 1
+        memory: 1Gi
+      requests:
+        cpu: 250m
+        memory: 256Mi
+
+# Redis sub-chart
+redis:
+  enabled: true
+  architecture: standalone
+  auth:
+    enabled: true
+    password: redis_password
+  master:
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+
+# Guacd sidecar for RDP support
+guacd:
+  enabled: true
+  image:
+    repository: guacamole/guacd
+    tag: 1.6.0
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  securityContext:
+    readOnlyRootFilesystem: true
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+
+# Persistence
+persistence:
+  postgresql:
+    enabled: true
+    size: 10Gi
+    storageClass: ""
+    accessMode: ReadWriteOnce
+  redis:
+    enabled: true
+    size: 1Gi
+    storageClass: ""
+    accessMode: ReadWriteOnce
+
+# Configuration
+config:
+  # CORS_ORIGIN must match your frontend URLs (comma-separated)
+  corsOrigin: "http://localhost:3000"
+  # Generate with: openssl rand -hex 64
+  jwtSecret: ""
+  sessionSecret: ""
+  aiEncryptionKey: ""
+  # Generate with: openssl rand -hex 32
+  postgresPassword: ""
+  redisPassword: ""
+
+# Resource cleanup jobs
+cleanup:
+  enabled: true
+  # Schedule for daily cleanup of old agent reports
+  schedule: "0 2 * * *"
+  # Schedule for SSG content updates
+  ssgSchedule: "0 5 * * *"
+
+# Monitoring
+serviceMonitor:
+  enabled: false
+  namespace: monitoring
+  labels: {}
+  interval: 30s

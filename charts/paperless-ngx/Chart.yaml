@@ -1,6 +1,24 @@
 apiVersion: v2
 name: paperless-ngx
-description: A Helm chart for paperless-ngx
+description: A Helm chart for Paperless-ngx, a community-supported open-source document management system.
 type: application
-version: 1.0.4
-appVersion: "3.1.3"
+version: 0.3.2
+appVersion: "3.0.5"
+home: https://docs.paperless-ngx.com/
+icon: https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/resources/logo/web/png/Logo-Symbol/Black/PNG/Black%20logo%20-%20no%20background.png
+sources:
+  - https://github.com/paperless-ngx/paperless-ngx
+maintainers:
+  - name: Casey Robb
+    url: https://github.com/paperless-ngx/paperless-ngx
+keywords:
+  - paperless
+  - paperless-ngx
+  - document-management
+  - dms
+  - ocr
+dependencies:
+  - name: redis
+    version: 25.5.3
+    repository: oci://registry-1.docker.io/bitnamicharts
+    condition: redis.enabled

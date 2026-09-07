@@ -1,0 +1,76 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "patchmon.fullname" . }}-server
+  labels:
+    {{- include "patchmon.labels" . | nindent 4 }}
+  {{- with .Values.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.containerPort }}
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "patchmon.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: server
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "patchmon.fullname" . }}-postgresql
+  labels:
+    {{- include "patchmon.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5432
+      targetPort: 5432
+      protocol: TCP
+      name: postgresql
+  selector:
+    {{- include "patchmon.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: postgresql
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "patchmon.fullname" . }}-redis-master
+  labels:
+    {{- include "patchmon.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: 6379
+      targetPort: 6379
+      protocol: TCP
+      name: redis
+  selector:
+    {{- include "patchmon.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: redis
+
+---
+{{- if .Values.guacd.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "patchmon.fullname" . }}-guacd
+  labels:
+    {{- include "patchmon.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: 4822
+      targetPort: 4822
+      protocol: TCP
+      name: guacd
+  selector:
+    {{- include "patchmon.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: guacd
+{{- end }}

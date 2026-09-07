@@ -1,0 +1,51 @@
+Paperless-ngx has been deployed.
+
+Release name: {{ .Release.Name }}
+Namespace:    {{ .Release.Namespace }}
+
+1. Wait for the rollout:
+
+     kubectl --namespace {{ .Release.Namespace }} rollout status deployment/{{ include "paperless.fullname" . }}
+
+{{- if .Values.cnpg.enabled }}
+
+   The PostgreSQL cluster is managed by CloudNativePG. Check it with:
+
+     kubectl --namespace {{ .Release.Namespace }} get cluster {{ include "paperless.cnpg.clusterName" . }}
+{{- end }}
+
+2. Reach the UI:
+
+{{- if .Values.ingress.enabled }}
+   Ingress is enabled. Configured hosts:
+   {{- range .Values.ingress.hosts }}
+     - http{{ if $.Values.ingress.tls }}s{{ end }}://{{ .host }}{{ (index .paths 0).path }}
+   {{- end }}
+{{- else if eq .Values.service.type "LoadBalancer" }}
+   Watch for an external IP:
+
+     kubectl --namespace {{ .Release.Namespace }} get svc {{ include "paperless.fullname" . }} -w
+{{- else }}
+   Port-forward from your workstation:
+
+     kubectl --namespace {{ .Release.Namespace }} port-forward svc/{{ include "paperless.fullname" . }} 8000:{{ .Values.service.port }}
+
+   Then open http://127.0.0.1:8000
+{{- end }}
+
+3. Initial credentials:
+
+{{- if .Values.admin.existingSecret }}
+   Pulled from secret `{{ .Values.admin.existingSecret }}`.
+{{- else }}
+   Username: {{ .Values.admin.user }}
+   Password: kubectl --namespace {{ .Release.Namespace }} get secret {{ include "paperless.secretName" . }} -o jsonpath='{.data.PAPERLESS_ADMIN_PASSWORD}' | base64 -d ; echo
+{{- end }}
+
+{{- if and (not .Values.cnpg.enabled) (not .Values.externalDatabase.enabled) }}
+
+WARNING: No external database or CNPG cluster is configured; Paperless will
+fall back to SQLite on the `data` PVC. This is fine for evaluation but should
+not be used for production. Set `cnpg.enabled=true` or configure
+`externalDatabase` before going live.
+{{- end }}

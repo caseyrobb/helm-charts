@@ -1,0 +1,173 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "patchmon.fullname" . }}-server
+  labels:
+    {{- include "patchmon.labels" . | nindent 4 }}
+    app.kubernetes.io/component: server
+spec:
+  replicas: {{ .Values.server.replicas }}
+  selector:
+    matchLabels:
+      {{- include "patchmon.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: server
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/secrets: {{ include (print $.Template.BasePath "/secrets.yaml") . | sha256sum }}
+      {{- with .Values.server.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "patchmon.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: server
+    spec:
+      serviceAccountName: {{ include "patchmon.fullname" . }}-server
+      securityContext:
+        {{- toYaml .Values.server.securityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}-server
+          securityContext:
+            {{- toYaml .Values.server.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.containerPort }}
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: {{ include "patchmon.fullname" . }}-config
+            - secretRef:
+                name: {{ include "patchmon.fullname" . }}-secrets
+          {{- if .Values.server.envFrom }}
+            {{- toYaml .Values.server.envFrom | nindent 12 }}
+          {{- end }}
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "patchmon.fullname" . }}-secrets
+                  key: postgres-password
+                  optional: false
+            - name: POSTGRES_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "patchmon.fullname" . }}-config
+                  key: POSTGRES_HOST
+                  optional: false
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "patchmon.fullname" . }}-secrets
+                  key: postgres-username
+                  optional: false
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "patchmon.fullname" . }}-secrets
+                  key: postgres-database
+                  optional: false
+            - name: REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "patchmon.fullname" . }}-config
+                  key: REDIS_HOST
+                  optional: false
+            - name: REDIS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "patchmon.fullname" . }}-config
+                  key: REDIS_PORT
+                  optional: false
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "patchmon.fullname" . }}-secrets
+                  key: redis-password
+                  optional: false
+            - name: REDIS_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "patchmon.fullname" . }}-config
+                  key: REDIS_DB
+                  optional: false
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "patchmon.fullname" . }}-secrets
+                  key: jwt-secret
+                  optional: false
+            - name: SESSION_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "patchmon.fullname" . }}-secrets
+                  key: session-secret
+                  optional: false
+            - name: AI_ENCRYPTION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "patchmon.fullname" . }}-secrets
+                  key: ai-encryption-key
+                  optional: false
+            - name: CORS_ORIGIN
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "patchmon.fullname" . }}-config
+                  key: CORS_ORIGIN
+                  optional: false
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "patchmon.fullname" . }}-config
+                  key: PORT
+                  optional: false
+            - name: GUACD_ADDRESS
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "patchmon.fullname" . }}-config
+                  key: GUACD_ADDRESS
+                  optional: false
+          {{- if .Values.server.resources }}
+          resources:
+            {{- toYaml .Values.server.resources | nindent 12 }}
+          {{- end }}
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 30
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+      {{- with .Values.server.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.server.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.server.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
