@@ -29,9 +29,9 @@ jobs:
 
       - name: Package charts
         run: |
-          for chart in charts/*/; do
-            if [ -f "$chart/Chart.yaml" ]; then
-              helm package "$chart"
+          for chart_dir in charts/*/; do
+            if [ -f "${chart_dir}Chart.yaml" ]; then
+              helm package "${chart_dir}"
             fi
           done
 
