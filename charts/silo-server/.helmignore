@@ -1,65 +1,26 @@
-# Helm ignore patterns for silo-server chart
-# This file is used to exclude files from the chart package
+# Patterns to ignore when building packages.
+.DS_Store
 
-# Binaries for packages management
-*/bin
-*/obj
+# VCS
+.git/
+.gitignore
 
-# Environment files
+# Backup / editor
+*.swp
+*.bak
+*.tmp
+*~
+.project
+.idea/
+.vscode/
+
+# Env / secrets
 .env
 .env.*
-!.env.example
 
-# IDE and editor files
-.idea
-.vscode
-*.swp
-*.swo
-*~
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# Test files
-*_test.go
-*_test.py
-*_test.js
-*_test.ts
+# Tests / docs you don't want in the package
 tests/
 test/
-
-# Documentation
-*.md
-!README.md
 LICENSE
 CONTRIBUTING.md
 CHANGELOG.md
-
-# Build artifacts
-build/
-dist/
-*.egg-info/
-*.pyc
-
-# Git
-.git
-.gitignore
-
-# Helm
-*.tpl
-_templates/
-templates/_helpers.tpl
-
-# Logs
-*.log
-logs/
-
-# Docker
-Dockerfile
-docker-compose.yaml
-
-# Kubernetes manifests
-*.yaml
-!Chart.yaml
-!values.yaml
