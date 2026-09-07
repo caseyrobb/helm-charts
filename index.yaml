@@ -1,0 +1,57 @@
+apiVersion: v1
+entries:
+  paperless-ngx:
+    - name: paperless-ngx
+      version: 1.0.3
+      appVersion: "3.0.5"
+      description: A Helm chart for Paperless-ngx, a community-supported open-source document management system.
+      type: application
+      home: https://docs.paperless-ngx.com/
+      icon: https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/resources/logo/web/png/Logo-Symbol/Black/PNG/Black%20logo%20-%20no%20background.png
+      sources:
+        - https://github.com/paperless-ngx/paperless-ngx
+      maintainers:
+        - name: Casey Robb
+          url: https://github.com/paperless-ngx/paperless-ngx
+      keywords:
+        - paperless
+        - paperless-ngx
+        - document-management
+        - dms
+        - ocr
+      dependencies:
+        - name: redis
+          version: 25.5.3
+          repository: oci://registry-1.docker.io/bitnamicharts
+          condition: redis.enabled
+      urls:
+        - https://caseyrobb.github.io/helm-charts/paperless-ngx-1.0.3.tgz
+  patchmon:
+    - name: patchmon
+      version: 0.1.0
+      appVersion: "2.1.3"
+      description: Enterprise-grade Linux patch & server management platform
+      type: application
+      keywords:
+        - patch-management
+        - server-management
+        - rdp
+        - guacamole
+      maintainers:
+        - name: PatchMon Team
+          url: https://github.com/patchmon/patchmon
+      urls:
+        - https://caseyrobb.github.io/helm-charts/patchmon-0.1.0.tgz
+  silo-server:
+    - name: silo-server
+      version: 0.4.0
+      appVersion: "latest"
+      description: A Helm chart for Silo Server - a self-hosted media server for films, series, audiobooks, ebooks, podcasts, and manga
+      type: application
+      home: https://github.com/Silo-Server/silo-server
+      sources:
+        - https://github.com/Silo-Server/silo-server
+      maintainers:
+        - name: self-hosted
+      urls:
+        - https://caseyrobb.github.io/helm-charts/silo-server-0.4.0.tgz
