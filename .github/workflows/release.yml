@@ -34,6 +34,7 @@ jobs:
           for chart_dir in charts/*/; do
             if [[ -f "${chart_dir}Chart.yaml" ]]; then
               echo "Packaging ${chart_dir}"
+              helm dependency update "${chart_dir}"
               helm package "${chart_dir}"
               packaged=$((packaged + 1))
             fi
