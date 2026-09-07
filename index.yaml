@@ -25,7 +25,7 @@ entries:
           repository: oci://registry-1.docker.io/bitnamicharts
           condition: redis.enabled
       urls:
-        - https://caseyrobb.github.io/helm-charts/paperless-ngx-0.3.2.tgz
+        - https://raw.githubusercontent.com/caseyrobb/helm-charts/refs/tags/charts-20260907220625/paperless-ngx-0.3.2.tgz
   patchmon:
     - name: patchmon
       version: 0.1.0
@@ -41,7 +41,7 @@ entries:
         - name: PatchMon Team
           url: https://github.com/patchmon/patchmon
       urls:
-        - https://caseyrobb.github.io/helm-charts/patchmon-0.1.0.tgz
+        - https://raw.githubusercontent.com/caseyrobb/helm-charts/refs/tags/charts-20260907220625/patchmon-0.1.0.tgz
   silo-server:
     - name: silo-server
       version: 0.4.1
@@ -54,4 +54,4 @@ entries:
       maintainers:
         - name: self-hosted
       urls:
-        - https://caseyrobb.github.io/helm-charts/silo-server-0.4.1.tgz
+        - https://raw.githubusercontent.com/caseyrobb/helm-charts/refs/tags/charts-20260907220625/silo-server-0.4.1.tgz
