@@ -2,7 +2,7 @@ apiVersion: v1
 entries:
   paperless-ngx:
     - name: paperless-ngx
-      version: 1.0.3
+      version: 0.3.2
       appVersion: "3.0.5"
       description: A Helm chart for Paperless-ngx, a community-supported open-source document management system.
       type: application
@@ -25,7 +25,7 @@ entries:
           repository: oci://registry-1.docker.io/bitnamicharts
           condition: redis.enabled
       urls:
-        - https://caseyrobb.github.io/helm-charts/paperless-ngx-1.0.3.tgz
+        - https://caseyrobb.github.io/helm-charts/paperless-ngx-0.3.2.tgz
   patchmon:
     - name: patchmon
       version: 0.1.0
@@ -44,7 +44,7 @@ entries:
         - https://caseyrobb.github.io/helm-charts/patchmon-0.1.0.tgz
   silo-server:
     - name: silo-server
-      version: 0.4.0
+      version: 0.4.1
       appVersion: "latest"
       description: A Helm chart for Silo Server - a self-hosted media server for films, series, audiobooks, ebooks, podcasts, and manga
       type: application
@@ -54,4 +54,4 @@ entries:
       maintainers:
         - name: self-hosted
       urls:
-        - https://caseyrobb.github.io/helm-charts/silo-server-0.4.0.tgz
+        - https://caseyrobb.github.io/helm-charts/silo-server-0.4.1.tgz
