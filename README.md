@@ -28,6 +28,7 @@ helm install <release-name> caseyrobb/<chart-name>
 | Chart Name | Description | Version | Status |
 |------------|-------------|---------|--------|
 | [paperless-ngx](charts/paperless-ngx/README.md) | A document management system that transforms your physical documents into a searchable online archive | 1.0.3 | Ready |
+| [patchmon](charts/patchmon/README.md) | Enterprise-grade Linux patch & server management platform with RDP support | 0.1.0 | Ready |
 | [silo-server](charts/silo-server/README.md) | A self-hosted media server for films, series, audiobooks, ebooks, podcasts, and manga | 0.4.0 | Ready |
 
 ## Contributing
