@@ -5,7 +5,8 @@
 # Image settings
 image:
   repository: ghcr.io/patchmon/patchmon-server
-  tag: latest
+  # pinned to appVersion; Hermes weekly sweep bumps on new releases
+  tag: 2.1.3
   pullPolicy: IfNotPresent
 
 # Container port

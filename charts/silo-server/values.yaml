@@ -7,7 +7,11 @@ replicaCount: 1
 image:
   repository: ghcr.io/silo-server/silo-server
   pullPolicy: IfNotPresent
-  tag: "latest"
+  # Upstream publishes no versioned releases (latest/nightly/commit-sha only).
+  # Pinned to the digest of :latest as of 2026-10-13; the Hermes weekly sweep
+  # opens a PR when the digest changes. Set digest (repo@sha256:...) to win.
+  digest: ""
+  tag: "latest@sha256:524b2301353ba63a5917b80584b2e1fa05811a22b9e8105291e9bbdf4e766ce6"
 
 imagePullSecrets: []
 nameOverride: ""
