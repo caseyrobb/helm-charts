@@ -1,0 +1,8 @@
+# ct install fixture: chart gates on required DB values (no bundled subcharts).
+postgresql:
+  host: postgres
+  password: ci-password
+redis:
+  host: redis
+persistence:
+  enabled: false
