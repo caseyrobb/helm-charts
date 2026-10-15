@@ -5,3 +5,4 @@ chart-dirs:
 helm-extra-args: --timeout 600s
 validate-maintainers: false
 check-version-increment: true
+helm-extra-set-args: --wait=false

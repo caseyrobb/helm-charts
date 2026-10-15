@@ -1,0 +1,20 @@
+# ct install fixture: kind has no CNPG operator (Cluster CR would fail
+# client-side discovery) and no Postgres — point at external stubs instead.
+cnpg:
+  enabled: false
+externalDatabase:
+  enabled: true
+  host: postgres
+  port: 5432
+  database: paperless
+  user: paperless
+  password: ci-password
+persistence:
+  data:
+    enabled: false
+  media:
+    enabled: false
+  consume:
+    enabled: false
+  export:
+    enabled: false
