@@ -1,0 +1,53 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Renovate owns the GitHub Actions pins. Chart files (appVersion, image tags, subchart deps, silo digest) are owned by the Hermes weekly sweep, which bumps Chart.yaml `version:` atomically with the change — ct enforces check-version-increment on every changed chart, which Renovate cannot satisfy across files, so chart-file PRs would be permanently red.",
+  "kubernetes": { "fileMatch": [] },
+  "packageRules": [
+    {
+      "matchManagers": ["github-actions"],
+      "enabled": true,
+      "description": "Only manager left enabled"
+    },
+    {
+      "matchManagers": ["helmv3"],
+      "enabled": false,
+      "description": "Subchart dep bumps change charts/** without a chart version bump -> ct fails; owned by Hermes weekly sweep"
+    },
+    {
+      "matchManagers": ["custom.regex"],
+      "enabled": false,
+      "description": "App-version bumps need an atomic chart version bump; owned by Hermes weekly sweep"
+    },
+    {
+      "matchDepTypes": ["docker"],
+      "enabled": false,
+      "description": "Image tags live in chart values files; owned by Hermes weekly sweep"
+    },
+    {
+      "matchManagers": ["docker", "regex", "helmv3", "helm-values", "kubernetes", "argocd"],
+      "enabled": false,
+      "description": "All chart-content updates owned by Hermes weekly sweep (ct check-version-increment)"
+    },
+    {
+      "matchManagers": ["github-actions"],
+      "groupName": "github actions (minor/patch)",
+      "groupSlug": "gh-actions-minor",
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true,
+      "automergeType": "pr",
+      "platformAutomerge": true,
+      "labels": ["ci", "dependencies"]
+    },
+    {
+      "matchManagers": ["github-actions"],
+      "groupName": "github actions (major)",
+      "groupSlug": "gh-actions-major",
+      "matchUpdateTypes": ["major"],
+      "automerge": false,
+      "labels": ["ci", "dependencies", "major"]
+    }
+  ],
+  "schedule": ["after 9am and before 5pm on monday"],
+  "prHourlyLimit": 2,
+  "forkProcessing": "disabled"
+}
