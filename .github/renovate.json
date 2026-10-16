@@ -1,5 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "gitAuthor": "renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>",
   "description": "Renovate owns the GitHub Actions pins. Chart files (appVersion, image tags, subchart deps, silo digest) are owned by the Hermes weekly sweep, which bumps Chart.yaml `version:` atomically with the change — ct enforces check-version-increment on every changed chart, which Renovate cannot satisfy across files, so chart-file PRs would be permanently red.",
   "kubernetes": { "fileMatch": [] },
   "packageRules": [

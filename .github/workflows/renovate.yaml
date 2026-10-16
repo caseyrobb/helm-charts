@@ -21,3 +21,6 @@ jobs:
           token: ${{ secrets.RENOVATE_TOKEN }}
         env:
           LOG_LEVEL: info
+          # Without this the container starts with no target repo and logs
+          # "No repositories found" (verified in run 38943530687).
+          RENOVATE_REPOSITORIES: ${{ github.repository }}
