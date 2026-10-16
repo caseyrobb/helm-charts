@@ -6,6 +6,31 @@ entries:
       artifacthub.io/changes: https://github.com/usememos/helm/blob/main/CHANGELOG.md
     apiVersion: v2
     appVersion: 0.31.0
+    created: "2026-10-16T17:00:14.173834037Z"
+    description: A Helm chart for Kubernetes
+    digest: a494fdeae7196a88dfe9aaf5600f4b92d21afb6455de2e5d806ac561ea276d65
+    home: https://github.com/usememos/helm
+    icon: https://raw.githubusercontent.com/usememos/dotcom/main/public/logo.png
+    keywords:
+    - memos
+    - notes
+    - helm
+    maintainers:
+    - email: usememos@gmail.com
+      name: usememos
+    name: memos
+    sources:
+    - https://github.com/usememos/memos
+    - https://github.com/usememos/helm
+    type: application
+    urls:
+    - https://github.com/caseyrobb/helm-charts/releases/download/memos-0.3.1/memos-0.3.1.tgz
+    version: 0.3.1
+  - annotations:
+      artifacthub.io/categories: Productivity
+      artifacthub.io/changes: https://github.com/usememos/helm/blob/main/CHANGELOG.md
+    apiVersion: v2
+    appVersion: 0.31.0
     created: "2026-10-15T18:30:36.984508661Z"
     description: A Helm chart for Kubernetes
     digest: 4fe3153fccb8fc3de9f9b04b3cd5fc710a1d26ddbaa0ed8576c51b64a8fa78d2
@@ -227,4 +252,4 @@ entries:
     urls:
     - https://caseyrobb.github.io/helm-charts/silo-server-0.4.1.tgz
     version: 0.4.1
-generated: "2026-10-15T19:12:37.172972179Z"
+generated: "2026-10-16T17:00:14.173861778Z"
