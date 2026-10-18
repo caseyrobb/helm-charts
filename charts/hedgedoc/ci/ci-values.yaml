@@ -12,3 +12,11 @@ existingSecret: ci-hedgedoc-secrets
 hedgedoc:
   persistentStorage:
     enabled: false
+# No DB exists in kind: skip the TCP-wait init container and the HTTP
+# probes so the pod initializes and becomes ready (ct install --wait).
+waitForDb:
+  enabled: false
+livenessProbe:
+  enabled: false
+readinessProbe:
+  enabled: false

@@ -70,6 +70,11 @@ hedgedoc:
     CMD_ALLOW_ANONYMOUS: "false"
     CMD_ALLOW_ANONYMOUS_EDITS: "false"
 
+# -- Gate the wait-for-db init container (TCP-probes the configured DB
+# before the app starts). Disable in CI/evironments where no DB exists.
+waitForDb:
+  enabled: true
+
 resources: {}
 nodeSelector: {}
 tolerations: []
