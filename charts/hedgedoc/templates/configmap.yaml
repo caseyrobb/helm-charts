@@ -9,7 +9,7 @@ data:
   CMD_DB_HOST: {{ include "hedgedoc.dbHost" . | quote }}
   CMD_DB_PORT: {{ include "hedgedoc.dbPort" . | quote }}
   CMD_DB_NAME: {{ include "hedgedoc.dbName" . | quote }}
-  CMD_DB_USER: {{ include "hedgedoc.dbUser" . | quote }}
+  CMD_DB_USERNAME: {{ include "hedgedoc.dbUser" . | quote }}
   CMD_PORT: {{ .Values.hedgedoc.port | quote }}
   {{- range $k, $v := .Values.hedgedoc.env }}
   {{ $k }}: {{ $v | quote }}
