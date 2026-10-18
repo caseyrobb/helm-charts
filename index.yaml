@@ -7,6 +7,32 @@ entries:
           image: quay.io/hedgedoc/hedgedoc:1.12.0
     apiVersion: v2
     appVersion: 1.12.0
+    created: "2026-10-18T03:10:13.796900935Z"
+    description: HedgeDoc - real-time collaborative markdown notes (with native CNPG
+      Postgres support)
+    digest: 017b373eeccb317f8874a592f55c2dd094cbc95554232b641ce4fd576a9244ce
+    home: https://hedgedoc.org
+    keywords:
+    - hedgedoc
+    - codimd
+    - markdown
+    - notes
+    - collaboration
+    maintainers:
+    - name: Casey Robb
+    name: hedgedoc
+    sources:
+    - https://github.com/hedgedoc/hedgedoc
+    type: application
+    urls:
+    - https://github.com/caseyrobb/helm-charts/releases/download/hedgedoc-0.1.1/hedgedoc-0.1.1.tgz
+    version: 0.1.1
+  - annotations:
+      artifacthub.io/images: |
+        - name: hedgedoc
+          image: quay.io/hedgedoc/hedgedoc:1.12.0
+    apiVersion: v2
+    appVersion: 1.12.0
     created: "2026-10-18T02:46:31.3442909Z"
     description: HedgeDoc - real-time collaborative markdown notes (with native CNPG
       Postgres support)
@@ -279,4 +305,4 @@ entries:
     urls:
     - https://caseyrobb.github.io/helm-charts/silo-server-0.4.1.tgz
     version: 0.4.1
-generated: "2026-10-18T02:46:31.344320876Z"
+generated: "2026-10-18T03:10:13.796929479Z"
