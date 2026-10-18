@@ -1,0 +1,6 @@
+{{ .Chart.Name }} {{ .Chart.AppVersion }} installed as {{ include "hedgedoc.fullname" . }}.
+
+Database: {{ if .Values.cnpg.enabled }}CNPG Cluster {{ include "hedgedoc.cnpg.clusterName" . }} (app secret {{ include "hedgedoc.cnpg.appSecretName" . }}){{ else }}external {{ .Values.externalDatabase.type }} at {{ .Values.externalDatabase.host }}:{{ .Values.externalDatabase.port }}{{ end }}
+
+Required for first login (set via values `existingSecret` or a chart-managed
+`<fullname>-secrets` Secret): CMD_SESSION_SECRET{{ if not .Values.cnpg.enabled }}, CMD_DB_PASSWORD{{ end }}.

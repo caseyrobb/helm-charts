@@ -1,0 +1,8 @@
+# .helmignore
+*.swp
+*.bak
+.DS_Store
+.git
+.idea/
+.vscode/
+*.tgz
