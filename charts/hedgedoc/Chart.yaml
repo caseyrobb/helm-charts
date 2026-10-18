@@ -1,0 +1,21 @@
+apiVersion: v2
+name: hedgedoc
+description: HedgeDoc - real-time collaborative markdown notes (with native CNPG Postgres support)
+type: application
+version: 0.1.0
+appVersion: "1.12.0"
+home: https://hedgedoc.org
+sources:
+  - https://github.com/hedgedoc/hedgedoc
+keywords:
+  - hedgedoc
+  - codimd
+  - markdown
+  - notes
+  - collaboration
+maintainers:
+  - name: Casey Robb
+annotations:
+  artifacthub.io/images: |
+    - name: hedgedoc
+      image: quay.io/hedgedoc/hedgedoc:1.12.0

@@ -1,0 +1,129 @@
+# Default values for hedgedoc.
+# HedgeDoc cannot run HA with multiple replicas sharing a DB —
+# see https://docs.hedgedoc.org/faq/#can-i-run-multiple-instances-on-the-same-database
+replicaCount: 1
+
+image:
+  repository: quay.io/hedgedoc/hedgedoc
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+podSecurityContext: {}
+securityContext: {}
+
+strategy:
+  type: Recreate
+
+autoscaling:
+  enabled: false
+
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 20
+  periodSeconds: 5
+  timeoutSeconds: 2
+  successThreshold: 1
+  failureThreshold: 2
+
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 20
+  periodSeconds: 5
+  timeoutSeconds: 2
+  successThreshold: 1
+  failureThreshold: 2
+
+service:
+  type: ClusterIP
+  port: 3000
+
+hedgedoc:
+  # -- Container port for the HedgeDoc web app.
+  port: 3000
+  # -- Uploads storage. Media is written to /hedgedoc/public/uploads.
+  persistentStorage:
+    enabled: true
+    size: 10Gi
+    storageClass: ""
+    accessModes:
+      - ReadWriteOnce
+  # -- Extra CMD_* environment variables (see https://docs.hedgedoc.org/configuration/).
+  # DB connection vars are managed by the chart and must not be set here.
+  env:
+    NODE_ENV: "production"
+    CMD_FORBIDDEN_NOTE_IDS: "robots.txt, favicon.ico, api, build, css, docs, fonts, js, uploads, vendor, views"
+    CMD_IMAGE_UPLOAD_TYPE: "filesystem"
+    CMD_PROTOCOL_USESSL: "true"
+    CMD_URL_ADDPORT: "false"
+    CMD_ALLOW_EMAIL_REGISTER: "false"
+    CMD_ALLOW_ANONYMOUS: "false"
+    CMD_ALLOW_ANONYMOUS_EDITS: "false"
+
+resources: {}
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+# -- Native CloudNativePG Postgres. When enabled the chart renders a CNPG
+# Cluster CR and wires CMD_DB_* + the generated `<cluster>-app` password
+# secret into the deployment automatically.
+cnpg:
+  enabled: true
+  ## Name of the Cluster CR. Defaults to "<fullname>-pg" when empty.
+  clusterName: ""
+  instances: 1
+  imageName: "ghcr.io/cloudnative-pg/postgresql:16.4"
+  storage:
+    size: 10Gi
+    storageClass: ""
+  database: "hedgedoc"
+  owner: "hedgedoc"
+  ## Optional: name of an existing Secret with `username` and `password` keys
+  ## to bootstrap the application user. If empty, CNPG generates one.
+  bootstrapSecret: ""
+  resources: {}
+  monitoring:
+    enabled: false
+  backup:
+    enabled: false
+    ## Provide a BarmanObjectStore configuration when enabled, e.g.:
+    ## barmanObjectStore:
+    ##   destinationPath: s3://my-bucket/hedgedoc
+    ##   s3Credentials:
+    ##     accessKeyId:
+    ##       name: backup-creds
+    ##       key: ACCESS_KEY_ID
+    ##     secretAccessKey:
+    ##       name: backup-creds
+    ##       key: ACCESS_KEY
+    barmanObjectStore: {}
+    retentionPolicy: "30d"
+
+# -- External database. Used when cnpg.enabled=false. The referenced
+# credentials must be provided via `existingSecret` (key CMD_DB_PASSWORD).
+externalDatabase:
+  enabled: false
+  ## Set the database type (postgresql|mysql) — only postgresql is tested.
+  type: "postgresql"
+  host: ""
+  port: 5432
+  username: ""
+  database: "hedgedoc"
+
+# -- Name of an existing Secret providing CMD_SESSION_SECRET (always) and
+# CMD_DB_PASSWORD (when using externalDatabase). Defaults to
+# "<fullname>-secrets" when empty, which the platform is expected to manage
+# (e.g. an ExternalSecret from Vault) — the reference is optional so the pod
+# still schedules before the secret exists.
+existingSecret: ""

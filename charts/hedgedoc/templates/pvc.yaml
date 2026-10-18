@@ -1,0 +1,18 @@
+{{- if .Values.hedgedoc.persistentStorage.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "hedgedoc.fullname" . }}
+  labels:
+    {{- include "hedgedoc.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    {{- toYaml .Values.hedgedoc.persistentStorage.accessModes | nindent 4 }}
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: {{ .Values.hedgedoc.persistentStorage.size }}
+  {{- if .Values.hedgedoc.persistentStorage.storageClass }}
+  storageClassName: {{ .Values.hedgedoc.persistentStorage.storageClass | quote }}
+  {{- end }}
+{{- end }}
