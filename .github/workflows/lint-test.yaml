@@ -58,7 +58,10 @@ jobs:
           # hits the helm timeout. They stay covered by ct lint + ci fixtures.
           # TODO: provision shared postgres/redis in the kind namespace (or add
           # opt-in test DB templates) and drop these exclusions.
+          # ct matches --excluded-charts against the CHART DIRECTORY BASENAME
+          # (slices.Contains(ExcludedCharts, filepath.Base(dir)) in
+          # pkg/chart/chart.go) — "charts/patchmon" silently matches nothing.
           ct install --config .github/ct.yaml \
-            --excluded-charts charts/paperless-ngx \
-            --excluded-charts charts/patchmon \
-            --excluded-charts charts/silo-server
+            --excluded-charts paperless-ngx \
+            --excluded-charts patchmon \
+            --excluded-charts silo-server
