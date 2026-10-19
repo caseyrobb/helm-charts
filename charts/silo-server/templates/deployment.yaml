@@ -53,6 +53,15 @@ spec:
                 name: {{ include "silo-server.fullname" . }}-secret
           env:
             # Database configuration
+            # App bootstrap requires DATABASE_URL (the chart helper assembles it
+            # from the postgres values; SILO_DB_* keys are kept for parity).
+            - name: DATABASE_URL
+              value: {{ include "silo-server.database.url" . | quote }}
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "silo-server.fullname" . }}-secret
+                  key: secret-key
             - name: SILO_DB_HOST
               value: {{ include "silo-server.postgresql.host" . | quote }}
             - name: SILO_DB_PORT
@@ -153,13 +162,18 @@ spec:
         - name: media
           persistentVolumeClaim:
             claimName: {{ .Values.persistence.existingClaim }}
-        {{- else }}
+        {{- else if .Values.persistence.enabled }}
         - name: transcode
           persistentVolumeClaim:
             claimName: {{ include "silo-server.fullname" . }}-transcode
         - name: media
           persistentVolumeClaim:
             claimName: {{ include "silo-server.fullname" . }}-media
+        {{- else }}
+        - name: transcode
+          emptyDir: {}
+        - name: media
+          emptyDir: {}
         {{- end }}
         - name: plugins
           emptyDir: {}

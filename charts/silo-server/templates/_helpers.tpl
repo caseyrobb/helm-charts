@@ -77,9 +77,9 @@ Generate the database connection string
 */}}
 {{- define "silo-server.database.url" -}}
 {{- if .Values.postgresql.enabled }}
-{{- printf "postgresql://%s:%s@%s:%s/%s" .Values.postgresql.username (include "silo-server.postgresql.password" .) (include "silo-server.postgresql.host" .) (default "5432" .Values.postgresql.port) .Values.postgresql.database }}
+{{- printf "postgresql://%s:%s@%s:%s/%s" .Values.postgresql.username (include "silo-server.postgresql.password" .) (include "silo-server.postgresql.host" .) (default "5432" .Values.postgresql.port | int | toString) .Values.postgresql.database }}
 {{- else }}
-{{- printf "postgresql://%s:%s@%s:%s/%s" .Values.postgresql.username .Values.postgresql.password (include "silo-server.postgresql.host" .) (default "5432" .Values.postgresql.port) .Values.postgresql.database }}
+{{- printf "postgresql://%s:%s@%s:%s/%s" .Values.postgresql.username .Values.postgresql.password (include "silo-server.postgresql.host" .) (default "5432" .Values.postgresql.port | int | toString) .Values.postgresql.database }}
 {{- end }}
 {{- end }}
 
@@ -122,12 +122,12 @@ Generate the redis connection string
 {{- if .Values.redis.enabled }}
 {{- $password := include "silo-server.redis.password" . }}
 {{- if $password }}
-{{- printf "redis://:%s@%s:%s/0" $password (include "silo-server.redis.host" .) (default "6379" .Values.redis.port) }}
+{{- printf "redis://:%s@%s:%s/0" $password (include "silo-server.redis.host" .) (default "6379" .Values.redis.port | int | toString) }}
 {{- else }}
-{{- printf "redis://%s:%s/0" (include "silo-server.redis.host" .) (default "6379" .Values.redis.port) }}
+{{- printf "redis://%s:%s/0" (include "silo-server.redis.host" .) (default "6379" .Values.redis.port | int | toString) }}
 {{- end }}
 {{- else }}
-{{- printf "redis://%s:%s/0" (include "silo-server.redis.host" .) (default "6379" .Values.redis.port) }}
+{{- printf "redis://%s:%s/0" (include "silo-server.redis.host" .) (default "6379" .Values.redis.port | int | toString) }}
 {{- end }}
 {{- end }}
 

@@ -230,6 +230,12 @@ externalDatabase:
   ## sslmode applies to PostgreSQL only (disable | prefer | require | verify-ca | verify-full).
   sslmode: ""
 
+## Gate the wait-for-db / wait-for-redis init containers. Disable in CI
+## (kind) where no database exists: the infinite `until nc -z` loops would
+## otherwise keep the pod un-Ready and stall `ct install` past its timeout.
+waitForDb:
+  enabled: true
+
 ## ---------------------------------------------------------------------------
 ## Redis broker (Bitnami subchart). Disable to use an external broker.
 ## ---------------------------------------------------------------------------
