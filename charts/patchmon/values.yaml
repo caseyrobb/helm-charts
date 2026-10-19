@@ -6,7 +6,7 @@
 image:
   repository: ghcr.io/patchmon/patchmon-server
   # pinned to appVersion; Hermes weekly sweep bumps on new releases
-  tag: 2.1.3
+  tag: 2.1.6
   pullPolicy: IfNotPresent
 
 # Container port
