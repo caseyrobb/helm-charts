@@ -8,7 +8,7 @@ image:
   repository: ghcr.io/paperless-ngx/paperless-ngx
   pullPolicy: IfNotPresent
   ## Defaults to .Chart.AppVersion when unset.
-  tag: "3.3.1"
+  tag: "3.3.2"
 
 imagePullSecrets: []
 
@@ -230,6 +230,12 @@ externalDatabase:
   ## sslmode applies to PostgreSQL only (disable | prefer | require | verify-ca | verify-full).
   sslmode: ""
 
+## Gate the wait-for-db / wait-for-redis init containers. Disable in CI
+## (kind) where no database exists: the infinite `until nc -z` loops would
+## otherwise keep the pod un-Ready and stall `ct install` past its timeout.
+waitForDb:
+  enabled: true
+
 ## ---------------------------------------------------------------------------
 ## Redis broker (Bitnami subchart). Disable to use an external broker.
 ## ---------------------------------------------------------------------------
@@ -257,7 +263,7 @@ gotenberg:
   enabled: true
   image:
     repository: docker.io/gotenberg/gotenberg
-    tag: "8.37.0"
+    tag: "8.38.1"
     pullPolicy: IfNotPresent
   replicaCount: 1
   service:
@@ -277,7 +283,7 @@ tika:
   enabled: true
   image:
     repository: docker.io/apache/tika
-    tag: "3.3.1"
+    tag: "3.3.1.0"
     pullPolicy: IfNotPresent
   replicaCount: 1
   service:
