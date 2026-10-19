@@ -131,6 +131,35 @@ entries:
     version: 0.2.1
   paperless-ngx:
   - apiVersion: v2
+    appVersion: 3.3.2
+    created: "2026-10-19T17:38:10.743925321Z"
+    dependencies:
+    - condition: redis.enabled
+      name: redis
+      repository: oci://registry-1.docker.io/bitnamicharts
+      version: 28.3.1
+    description: A Helm chart for Paperless-ngx, a community-supported open-source
+      document management system.
+    digest: 8877054155bae599a1b1c1fd414a46cfff07749ba628850d1fde2aa72b497c31
+    home: https://docs.paperless-ngx.com/
+    icon: https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/resources/logo/web/png/Logo-Symbol/Black/PNG/Black%20logo%20-%20no%20background.png
+    keywords:
+    - paperless
+    - paperless-ngx
+    - document-management
+    - dms
+    - ocr
+    maintainers:
+    - name: Casey Robb
+      url: https://github.com/paperless-ngx/paperless-ngx
+    name: paperless-ngx
+    sources:
+    - https://github.com/paperless-ngx/paperless-ngx
+    type: application
+    urls:
+    - https://github.com/caseyrobb/helm-charts/releases/download/paperless-ngx-0.6.0/paperless-ngx-0.6.0.tgz
+    version: 0.6.0
+  - apiVersion: v2
     appVersion: 3.3.1
     created: "2026-10-15T18:30:37.247251903Z"
     dependencies:
@@ -219,6 +248,24 @@ entries:
     version: 0.3.2
   patchmon:
   - apiVersion: v2
+    appVersion: 2.1.6
+    created: "2026-10-19T17:38:11.008168016Z"
+    description: Enterprise-grade Linux patch & server management platform
+    digest: 04572fddc817c8d1648e4aa937da2308087b426576b157e07225889e6575ae22
+    keywords:
+    - patch-management
+    - server-management
+    - rdp
+    - guacamole
+    maintainers:
+    - name: PatchMon Team
+      url: https://github.com/patchmon/patchmon
+    name: patchmon
+    type: application
+    urls:
+    - https://github.com/caseyrobb/helm-charts/releases/download/patchmon-0.2.0/patchmon-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
     appVersion: 2.1.3
     created: "2026-10-15T19:12:36.970957417Z"
     description: Enterprise-grade Linux patch & server management platform
@@ -275,6 +322,22 @@ entries:
   silo-server:
   - apiVersion: v2
     appVersion: latest
+    created: "2026-10-19T17:38:11.305481194Z"
+    description: A Helm chart for Silo Server - a self-hosted media server for films,
+      series, audiobooks, ebooks, podcasts, and manga
+    digest: 0e782f444aea4de08c9108f7e128e1195961a562c56f6cf907f417b6b8d7bb3e
+    home: https://github.com/Silo-Server/silo-server
+    maintainers:
+    - name: self-hosted
+    name: silo-server
+    sources:
+    - https://github.com/Silo-Server/silo-server
+    type: application
+    urls:
+    - https://github.com/caseyrobb/helm-charts/releases/download/silo-server-0.4.3/silo-server-0.4.3.tgz
+    version: 0.4.3
+  - apiVersion: v2
+    appVersion: latest
     created: "2026-10-15T18:31:07.42205826Z"
     description: A Helm chart for Silo Server - a self-hosted media server for films,
       series, audiobooks, ebooks, podcasts, and manga
@@ -305,4 +368,4 @@ entries:
     urls:
     - https://caseyrobb.github.io/helm-charts/silo-server-0.4.1.tgz
     version: 0.4.1
-generated: "2026-10-18T03:10:13.796929479Z"
+generated: "2026-10-19T17:38:11.30552732Z"
