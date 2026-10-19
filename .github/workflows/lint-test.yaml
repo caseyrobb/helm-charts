@@ -59,6 +59,6 @@ jobs:
           # TODO: provision shared postgres/redis in the kind namespace (or add
           # opt-in test DB templates) and drop these exclusions.
           ct install --config .github/ct.yaml \
-            --exclude-chart charts/paperless-ngx \
-            --exclude-chart charts/patchmon \
-            --exclude-chart charts/silo-server
+            --excluded-charts charts/paperless-ngx \
+            --excluded-charts charts/patchmon \
+            --excluded-charts charts/silo-server
