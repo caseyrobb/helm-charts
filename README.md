@@ -25,11 +25,17 @@ helm install <release-name> caseyrobb/<chart-name>
 
 ## Available Charts
 
-| Chart Name | Description | Version | Status |
-|------------|-------------|---------|--------|
-| [paperless-ngx](charts/paperless-ngx/README.md) | A document management system that transforms your physical documents into a searchable online archive | 1.0.3 | Ready |
-| [patchmon](charts/patchmon/README.md) | Enterprise-grade Linux patch & server management platform with RDP support | 0.1.0 | Ready |
-| [silo-server](charts/silo-server/README.md) | A self-hosted media server for films, series, audiobooks, ebooks, podcasts, and manga | 0.4.0 | Ready |
+| Chart | Description | Chart version | App version | Upstream |
+|-------|-------------|---------------|-------------|----------|
+| [hedgedoc](charts/hedgedoc/README.md) | Real-time collaborative markdown notes, with native CloudNativePG Postgres support | 0.1.1 | HedgeDoc 1.12.0 | [hedgedoc.org](https://hedgedoc.org) |
+| [memos](charts/memos/README.md) | Self-hosted, lightweight notes/memo service (Google Keep replacement) | 0.3.1 | Memos 0.31.0 | [usememos/helm](https://github.com/usememos/helm) |
+| [paperless-ngx](charts/paperless-ngx/README.md) | Document management system that turns physical documents into a searchable online archive (CNPG Postgres + Redis options) | 0.5.0 | Paperless-ngx 3.3.1 | [docs.paperless-ngx.com](https://docs.paperless-ngx.com/) |
+| [patchmon](charts/patchmon/README.md) | Enterprise-grade Linux patch & server management platform with RDP support | 0.1.2 | PatchMon 2.1.3 | PatchMon (self-hosted) |
+| [silo-server](charts/silo-server/README.md) | Self-hosted media server for films, series, audiobooks, ebooks, podcasts, and manga | 0.4.2 | `latest` (image pinned by digest in values) | [Silo-Server/silo-server](https://github.com/Silo-Server/silo-server) |
+
+> Chart versions above are a snapshot; the authoritative current versions are in the
+> published index — run `helm search repo caseyrobb --versions` or browse
+> [index.yaml](https://caseyrobb.github.io/helm-charts/index.yaml).
 
 ## Contributing
 
