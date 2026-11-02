@@ -61,7 +61,12 @@ jobs:
           # ct matches --excluded-charts against the CHART DIRECTORY BASENAME
           # (slices.Contains(ExcludedCharts, filepath.Base(dir)) in
           # pkg/chart/chart.go) — "charts/patchmon" silently matches nothing.
+          # cloudflare-tunnel-remote: cloudflared never becomes Ready in kind
+          # (needs a real tunnel token to open the edge connection, and the
+          # liveness probe hits /ready which only returns 200 while
+          # connected). Covered by ct lint + template assertions.
           ct install --config .github/ct.yaml \
             --excluded-charts paperless-ngx \
             --excluded-charts patchmon \
-            --excluded-charts silo-server
+            --excluded-charts silo-server \
+            --excluded-charts cloudflare-tunnel-remote
