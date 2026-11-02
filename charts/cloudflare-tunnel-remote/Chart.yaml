@@ -5,10 +5,14 @@ description: Deployment of a remotely managed tunnel that has already been provi
 icon: https://developers.cloudflare.com/cloudflare-one/favicon-32x32.png
 name: cloudflare-tunnel-remote
 type: application
-version: 0.1.3
+version: 0.1.4
 # Fork of https://cloudflare.github.io/helm-charts cloudflare-tunnel-remote 0.1.2
-# Adds .Values.extraEnv so TUNNEL_TRANSPORT_PROTOCOL can be pinned (cloudflared
-# 2026.10.x drops the WebSocket Upgrade header on the QUIC transport; see
-# cloudflare/cloudflared#1652).
+# Adds:
+# - .Values.extraEnv (0.1.3): pass-through env for the connector.
+# - .Values.cloudflare.existingSecret / existingSecretKey (0.1.4): consume a
+#   Secret managed elsewhere (e.g. External Secrets). Without this the chart
+#   always renders its own Secret from .Values.cloudflare.tunnel_token, which
+#   then fights an ExternalSecret targeting the same object (chart-vs-ESO
+#   ownership conflict -> permanent ArgoCD OutOfSync + selfHeal ping-pong).
 annotations:
   upstreamVersion: "0.1.2"
