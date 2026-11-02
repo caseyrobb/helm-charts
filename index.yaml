@@ -22,6 +22,32 @@ entries:
           image: quay.io/hedgedoc/hedgedoc:1.12.0
     apiVersion: v2
     appVersion: 1.12.0
+    created: "2026-11-02T17:28:22.974607523Z"
+    description: HedgeDoc - real-time collaborative markdown notes (with native CNPG
+      Postgres support)
+    digest: 458c1dd7d4ed9e7516c35f25dc3e4de7002424171003e9ff6a22cda800b15ae9
+    home: https://hedgedoc.org
+    keywords:
+    - hedgedoc
+    - codimd
+    - markdown
+    - notes
+    - collaboration
+    maintainers:
+    - name: Casey Robb
+    name: hedgedoc
+    sources:
+    - https://github.com/hedgedoc/hedgedoc
+    type: application
+    urls:
+    - https://github.com/caseyrobb/helm-charts/releases/download/hedgedoc-0.1.2/hedgedoc-0.1.2.tgz
+    version: 0.1.2
+  - annotations:
+      artifacthub.io/images: |
+        - name: hedgedoc
+          image: quay.io/hedgedoc/hedgedoc:1.12.0
+    apiVersion: v2
+    appVersion: 1.12.0
     created: "2026-10-18T03:10:13.796900935Z"
     description: HedgeDoc - real-time collaborative markdown notes (with native CNPG
       Postgres support)
@@ -69,6 +95,31 @@ entries:
     - https://github.com/caseyrobb/helm-charts/releases/download/hedgedoc-0.1.0/hedgedoc-0.1.0.tgz
     version: 0.1.0
   memos:
+  - annotations:
+      artifacthub.io/categories: Productivity
+      artifacthub.io/changes: https://github.com/usememos/helm/blob/main/CHANGELOG.md
+    apiVersion: v2
+    appVersion: 26.11.0
+    created: "2026-11-02T17:28:23.117338666Z"
+    description: A Helm chart for Kubernetes
+    digest: cb6c4501f6b30e93b5257f455ee682430738f55570e44db2ae9174646271a8d9
+    home: https://github.com/usememos/helm
+    icon: https://raw.githubusercontent.com/usememos/dotcom/main/public/logo.png
+    keywords:
+    - memos
+    - notes
+    - helm
+    maintainers:
+    - email: usememos@gmail.com
+      name: usememos
+    name: memos
+    sources:
+    - https://github.com/usememos/memos
+    - https://github.com/usememos/helm
+    type: application
+    urls:
+    - https://github.com/caseyrobb/helm-charts/releases/download/memos-0.4.0/memos-0.4.0.tgz
+    version: 0.4.0
   - annotations:
       artifacthub.io/categories: Productivity
       artifacthub.io/changes: https://github.com/usememos/helm/blob/main/CHANGELOG.md
@@ -145,6 +196,35 @@ entries:
     - https://github.com/caseyrobb/helm-charts/releases/download/memos-0.2.1/memos-0.2.1.tgz
     version: 0.2.1
   paperless-ngx:
+  - apiVersion: v2
+    appVersion: 3.4.1
+    created: "2026-11-02T17:28:23.345370955Z"
+    dependencies:
+    - condition: redis.enabled
+      name: redis
+      repository: oci://registry-1.docker.io/bitnamicharts
+      version: 28.3.10
+    description: A Helm chart for Paperless-ngx, a community-supported open-source
+      document management system.
+    digest: 7ddbf726b2e2c0be2b09cdf2534b7c29a264850b5ff2b6d801da818eaa2df325
+    home: https://docs.paperless-ngx.com/
+    icon: https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/resources/logo/web/png/Logo-Symbol/Black/PNG/Black%20logo%20-%20no%20background.png
+    keywords:
+    - paperless
+    - paperless-ngx
+    - document-management
+    - dms
+    - ocr
+    maintainers:
+    - name: Casey Robb
+      url: https://github.com/paperless-ngx/paperless-ngx
+    name: paperless-ngx
+    sources:
+    - https://github.com/paperless-ngx/paperless-ngx
+    type: application
+    urls:
+    - https://github.com/caseyrobb/helm-charts/releases/download/paperless-ngx-0.8.0/paperless-ngx-0.8.0.tgz
+    version: 0.8.0
   - apiVersion: v2
     appVersion: 3.3.4
     created: "2026-10-30T22:18:22.22439637Z"
@@ -366,6 +446,22 @@ entries:
   silo-server:
   - apiVersion: v2
     appVersion: latest
+    created: "2026-11-02T17:28:23.523554503Z"
+    description: A Helm chart for Silo Server - a self-hosted media server for films,
+      series, audiobooks, ebooks, podcasts, and manga
+    digest: 673574edefb71480febcc4b4817fe4978ddba32aeb2352fd350d731bf836c403
+    home: https://github.com/Silo-Server/silo-server
+    maintainers:
+    - name: self-hosted
+    name: silo-server
+    sources:
+    - https://github.com/Silo-Server/silo-server
+    type: application
+    urls:
+    - https://github.com/caseyrobb/helm-charts/releases/download/silo-server-0.4.5/silo-server-0.4.5.tgz
+    version: 0.4.5
+  - apiVersion: v2
+    appVersion: latest
     created: "2026-10-30T22:18:22.372977551Z"
     description: A Helm chart for Silo Server - a self-hosted media server for films,
       series, audiobooks, ebooks, podcasts, and manga
@@ -428,4 +524,4 @@ entries:
     urls:
     - https://caseyrobb.github.io/helm-charts/silo-server-0.4.1.tgz
     version: 0.4.1
-generated: "2026-11-02T17:26:11.600049423Z"
+generated: "2026-11-02T17:28:23.523594432Z"
