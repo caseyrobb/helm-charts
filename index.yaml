@@ -5,6 +5,20 @@ entries:
       upstreamVersion: 0.1.2
     apiVersion: v2
     appVersion: latest
+    created: "2026-11-02T18:13:42.370135721Z"
+    description: Deployment of a remotely managed tunnel that has already been provisioned
+      in Cloudflare
+    digest: b4e82e756817a854dba9f4dbfe65c703e8dc4d1c1be35dfcba8d91473ed2bfa1
+    icon: https://developers.cloudflare.com/cloudflare-one/favicon-32x32.png
+    name: cloudflare-tunnel-remote
+    type: application
+    urls:
+    - https://github.com/caseyrobb/helm-charts/releases/download/cloudflare-tunnel-remote-0.1.4/cloudflare-tunnel-remote-0.1.4.tgz
+    version: 0.1.4
+  - annotations:
+      upstreamVersion: 0.1.2
+    apiVersion: v2
+    appVersion: latest
     created: "2026-11-02T17:26:11.600014428Z"
     description: Deployment of a remotely managed tunnel that has already been provisioned
       in Cloudflare
@@ -524,4 +538,4 @@ entries:
     urls:
     - https://caseyrobb.github.io/helm-charts/silo-server-0.4.1.tgz
     version: 0.4.1
-generated: "2026-11-02T17:28:23.523594432Z"
+generated: "2026-11-02T18:13:42.37020501Z"
