@@ -88,7 +88,7 @@ cnpg:
   ## Name of the Cluster CR. Defaults to "<fullname>-pg" when empty.
   clusterName: ""
   instances: 1
-  imageName: "ghcr.io/cloudnative-pg/postgresql:16.4"
+  imageName: "ghcr.io/cloudnative-pg/postgresql:16.15"
   storage:
     size: 10Gi
     storageClass: ""
