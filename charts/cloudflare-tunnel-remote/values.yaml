@@ -3,6 +3,10 @@
 # Cloudflare parameters.
 cloudflare:
   tunnel_token: ""
+  # Set to the name of a Secret managed elsewhere (e.g. by External Secrets)
+  # to skip chart-side Secret rendering and read TUNNEL_TOKEN from it.
+  existingSecret: ""
+  existingSecretKey: ""
 
 image:
   repository: cloudflare/cloudflared
