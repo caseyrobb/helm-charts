@@ -25,7 +25,7 @@
       "description": "Image tags live in chart values files; owned by Hermes weekly sweep"
     },
     {
-      "matchManagers": ["docker", "regex", "helmv3", "helm-values", "kubernetes", "argocd"],
+      "matchManagers": ["dockerfile", "regex", "helmv3", "helm-values", "kubernetes", "argocd"],
       "enabled": false,
       "description": "All chart-content updates owned by Hermes weekly sweep (ct check-version-increment)"
     },
