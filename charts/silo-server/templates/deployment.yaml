@@ -137,6 +137,9 @@ spec:
               mountPath: {{ .Values.config.silo_catalog_seeds_dir }}
             - name: media
               mountPath: {{ .Values.config.silo_media_dir }}
+            {{- with .Values.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
             {{- if .Values.gpu.enabled }}
             {{- if .Values.gpu.device.intel }}
             - name: dev-dri
@@ -223,4 +226,7 @@ spec:
           hostPath:
             path: /usr/bin/nvidia-container-toolkit
         {{- end }}
+        {{- end }}
+        {{- with .Values.extraVolumes }}
+        {{- toYaml . | nindent 8 }}
         {{- end }}

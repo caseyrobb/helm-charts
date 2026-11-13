@@ -28,6 +28,16 @@ podSecurityContext: {}
 
 securityContext: {}
 
+# Additional volumes/mounts appended verbatim to the pod (e.g. NFS media
+# shares served straight from the NAS, mirroring the jellyfin chart pattern):
+#   extraVolumes:
+#     - name: video-nfs
+#       nfs: { server: fenrir.example, path: /rust/video }
+#   extraVolumeMounts:
+#     - { name: video-nfs, mountPath: /media/video }
+extraVolumes: []
+extraVolumeMounts: []
+
 service:
   type: ClusterIP
   ports:
