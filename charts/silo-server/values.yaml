@@ -137,6 +137,14 @@ config:
   silo_log_level: "info"
 
 # GPU configuration for hardware transcoding
+# Supply an externally-managed Secret (e.g. synced by ExternalSecrets from
+# Vault) instead of the chart-rendered one. When set, the chart omits its own
+# Secret and the Deployment reads DATABASE_URL and SECRET_KEY from this secret
+# via secretKeyRef (UPPERCASE keys) and envFrom. Expected keys:
+#   SECRET_KEY, DATABASE_URL, REDIS_URL
+secrets:
+  existingSecret: ""
+
 gpu:
   enabled: false
   device:
