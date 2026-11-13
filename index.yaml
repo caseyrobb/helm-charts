@@ -507,6 +507,22 @@ entries:
   silo-server:
   - apiVersion: v2
     appVersion: latest
+    created: "2026-11-13T16:42:40.601644144Z"
+    description: A Helm chart for Silo Server - a self-hosted media server for films,
+      series, audiobooks, ebooks, podcasts, and manga
+    digest: 49f5a1b8c0ea2a144fd803a5f4261f5c66f3efc522c5a2a6b57864db7738610b
+    home: https://github.com/Silo-Server/silo-server
+    maintainers:
+    - name: self-hosted
+    name: silo-server
+    sources:
+    - https://github.com/Silo-Server/silo-server
+    type: application
+    urls:
+    - https://github.com/caseyrobb/helm-charts/releases/download/silo-server-0.4.9/silo-server-0.4.9.tgz
+    version: 0.4.9
+  - apiVersion: v2
+    appVersion: latest
     created: "2026-11-13T16:14:23.821105163Z"
     description: A Helm chart for Silo Server - a self-hosted media server for films,
       series, audiobooks, ebooks, podcasts, and manga
@@ -633,4 +649,4 @@ entries:
     urls:
     - https://caseyrobb.github.io/helm-charts/silo-server-0.4.1.tgz
     version: 0.4.1
-generated: "2026-11-13T16:14:23.821160411Z"
+generated: "2026-11-13T16:42:40.601712382Z"
