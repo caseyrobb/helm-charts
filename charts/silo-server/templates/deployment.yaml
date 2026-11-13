@@ -50,18 +50,29 @@ spec:
             - configMapRef:
                 name: {{ include "silo-server.fullname" . }}-config
             - secretRef:
-                name: {{ include "silo-server.fullname" . }}-secret
+                name: {{ .Values.secrets.existingSecret | default (printf "%s-secret" (include "silo-server.fullname" .)) }}
           env:
             # Database configuration
             # App bootstrap requires DATABASE_URL (the chart helper assembles it
             # from the postgres values; SILO_DB_* keys are kept for parity).
             - name: DATABASE_URL
+              {{- if .Values.secrets.existingSecret }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.existingSecret }}
+                  key: DATABASE_URL
+              {{- else }}
               value: {{ include "silo-server.database.url" . | quote }}
+              {{- end }}
             - name: SECRET_KEY
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "silo-server.fullname" . }}-secret
+                  name: {{ .Values.secrets.existingSecret | default (printf "%s-secret" (include "silo-server.fullname" .)) }}
+                  {{- if .Values.secrets.existingSecret }}
+                  key: SECRET_KEY
+                  {{- else }}
                   key: secret-key
+                  {{- end }}
             - name: SILO_DB_HOST
               value: {{ include "silo-server.postgresql.host" . | quote }}
             - name: SILO_DB_PORT
@@ -132,8 +143,12 @@ spec:
             {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-      {{- if .Values.gpu.enabled }}
+      {{- if or .Values.gpu.enabled .Values.nodeSelector }}
       nodeSelector:
+        {{- with .Values.nodeSelector }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- if .Values.gpu.enabled }}
         kubernetes.io/os: linux
         {{- if .Values.gpu.device.nvidia }}
         nvidia.com/gpu.present: "true"
@@ -141,10 +156,7 @@ spec:
         {{- if .Values.gpu.device.intel }}
         intel.com/qsv: "true"
         {{- end }}
-      {{- end }}
-      {{- with .Values.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
+        {{- end }}
       {{- end }}
       {{- with .Values.affinity }}
       affinity:
