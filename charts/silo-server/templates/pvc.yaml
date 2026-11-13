@@ -1,4 +1,5 @@
 {{- if and .Values.persistence.enabled (not .Values.persistence.existingClaim) }}
+{{- if .Values.persistence.volumes.transcode.enabled }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -15,8 +16,10 @@ spec:
   {{- end }}
   resources:
     requests:
-      storage: {{ .Values.persistence.size | quote }}
+      storage: {{ default .Values.persistence.size .Values.persistence.volumes.transcode.size | quote }}
+{{- end }}
 ---
+{{- if .Values.persistence.volumes.media.enabled }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -33,8 +36,10 @@ spec:
   {{- end }}
   resources:
     requests:
-      storage: {{ .Values.persistence.size | quote }}
+      storage: {{ default .Values.persistence.size .Values.persistence.volumes.media.size | quote }}
+{{- end }}
 ---
+{{- if .Values.persistence.volumes.plugins.enabled }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -51,8 +56,10 @@ spec:
   {{- end }}
   resources:
     requests:
-      storage: {{ .Values.persistence.size | quote }}
+      storage: {{ default .Values.persistence.size .Values.persistence.volumes.plugins.size | quote }}
+{{- end }}
 ---
+{{- if .Values.persistence.volumes.catalogSeeds.enabled }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -69,5 +76,6 @@ spec:
   {{- end }}
   resources:
     requests:
-      storage: {{ .Values.persistence.size | quote }}
+      storage: {{ default .Values.persistence.size .Values.persistence.volumes.catalogSeeds.size | quote }}
+{{- end }}
 {{- end }}
