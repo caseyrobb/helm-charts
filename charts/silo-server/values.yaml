@@ -26,6 +26,13 @@ podAnnotations: {}
 
 podSecurityContext: {}
 
+# Pod-level sysctls appended to pod securityContext.sysctls (netns-owned
+# safe sysctls on k8s >= 1.32, e.g.):
+#   podSysctls:
+#     - name: net.ipv4.tcp_wmem
+#       value: "4096 131072 67108864"
+podSysctls: []
+
 securityContext: {}
 
 # Additional volumes/mounts appended verbatim to the pod (e.g. NFS media
@@ -99,6 +106,22 @@ persistence:
   accessModes:
     - ReadWriteOnce
   size: 100Gi
+  # Per-volume overrides. enabled=false renders an emptyDir instead of a PVC
+  # (e.g. media served from NFS via extraVolumes, or scratch dirs). size ""
+  # inherits persistence.size.
+  volumes:
+    transcode:
+      enabled: true
+      size: ""
+    plugins:
+      enabled: true
+      size: ""
+    catalogSeeds:
+      enabled: true
+      size: ""
+    media:
+      enabled: true
+      size: ""
   # Subpath for each volume
   transcodeSubPath: transcode
   pluginsSubPath: plugins
