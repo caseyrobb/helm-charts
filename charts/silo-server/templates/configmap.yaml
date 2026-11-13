@@ -32,6 +32,8 @@ data:
   SILO_URL: {{ .Values.config.silo_url | quote }}
   SILO_HOST: {{ .Values.config.silo_host | quote }}
   SILO_PORT: {{ .Values.config.silo_port | quote }}
+  # PORT is the key the silo binary actually honours (lib.sh silo_port:).
+  PORT: {{ .Values.config.silo_port | quote }}
   SILO_MEDIA_PORT: {{ .Values.config.silo_media_port | quote }}
   
   # Directories

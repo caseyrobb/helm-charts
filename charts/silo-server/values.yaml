@@ -100,6 +100,12 @@ config:
   # General settings
   silo_url: "http://localhost:8090"
   silo_host: "0.0.0.0"
+  # The silo binary honours PORT (container env wins over the /config/silo/.env
+  # PORT= line, then silo's built-in 8080 default). SILO_LISTEN is
+  # upstream-compose parity only; the binary does not read it.
+  # The silo binary honours PORT (container env wins over the /config/silo/.env
+  # PORT= line, then silo's built-in 8080 default); the chart emits both PORT
+  # and SILO_PORT from this value. SILO_LISTEN is upstream-compose parity only.
   silo_port: 8090
   silo_media_port: 8096
   silo_listen: "0.0.0.0:8090"
