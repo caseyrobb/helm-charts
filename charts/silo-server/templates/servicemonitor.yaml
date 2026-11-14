@@ -1,0 +1,35 @@
+{{- if and .Values.metrics.enabled .Values.metrics.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "silo-server.fullname" . }}
+  labels:
+    {{- include "silo-server.labels" . | nindent 4 }}
+    {{- with .Values.metrics.serviceMonitor.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "silo-server.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: metrics
+  endpoints:
+    - port: metrics
+      path: /metrics
+      interval: {{ .Values.metrics.serviceMonitor.interval }}
+      scrapeTimeout: {{ .Values.metrics.serviceMonitor.scrapeTimeout }}
+      sampleLimit: {{ .Values.metrics.serviceMonitor.sampleLimit }}
+      relabelings:
+        # Upstream alert rules (deploy/observability/silo.rules.yml) key on
+        # {job="silo"}; replace the operator-generated scrape job name.
+        - targetLabel: job
+          replacement: silo
+        {{- with .Values.metrics.serviceMonitor.cluster }}
+        - targetLabel: cluster
+          replacement: {{ . | quote }}
+        {{- end }}
+        # process_role carries the deployment role. NEVER relabel `role`:
+        # silo reserves it for database/cache/storage pool labels.
+        - targetLabel: process_role
+          replacement: api
+{{- end }}

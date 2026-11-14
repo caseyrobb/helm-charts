@@ -190,3 +190,19 @@ gpu:
     intel: false
     nvidia: false
     arm: false
+
+metrics:
+  # Dedicated Prometheus listener. The silo web port answers 404 on /metrics
+  # BY DESIGN; metrics are served only when SILO_METRICS_LISTEN is set.
+  # The listener is UNAUTHENTICATED - scrape the dedicated -metrics Service
+  # only; never publish it via ingress/HTTPRoute (upstream doc contract).
+  enabled: false
+  port: 9091
+  serviceMonitor:
+    enabled: false
+    interval: 15s
+    scrapeTimeout: 10s
+    sampleLimit: 20000
+    # cluster label value expected by upstream silo.rules.yml + dashboard
+    cluster: ""
+    labels: {}
