@@ -7,6 +7,7 @@ on:
     paths:
       - "charts/**"
       - ".github/workflows/release.yaml"
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -38,3 +39,23 @@ jobs:
           skip_existing: true
         env:
           CR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update GitHub Pages landing page
+        run: |
+          set -euo pipefail
+          git fetch --depth=1 origin gh-pages
+          git worktree add /tmp/ghpages FETCH_HEAD
+          python3 .github/scripts/render_pages_index.py \
+            --index /tmp/ghpages/index.yaml \
+            --output /tmp/ghpages/index.html
+          cd /tmp/ghpages
+          # index.html wins over the legacy Jekyll-rendered README at /
+          git add index.html
+          git rm --cached README.md --quiet 2>/dev/null || true
+          rm -f README.md
+          if git diff --cached --quiet; then
+            echo "Landing page already up to date."
+          else
+            git commit -m "Update landing page from index.yaml [skip ci]"
+            git push "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}" HEAD:gh-pages
+          fi
