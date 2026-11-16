@@ -202,7 +202,8 @@ metrics:
     enabled: false
     interval: 15s
     scrapeTimeout: 10s
-    sampleLimit: 20000
+    # only set if the target cluster prometheus-operator CRD declares sampleLimit
+    sampleLimit: ""
     # cluster label value expected by upstream silo.rules.yml + dashboard
     cluster: ""
     labels: {}
