@@ -113,6 +113,31 @@ entries:
       artifacthub.io/categories: Productivity
       artifacthub.io/changes: https://github.com/usememos/helm/blob/main/CHANGELOG.md
     apiVersion: v2
+    appVersion: 26.11.1
+    created: "2026-11-16T15:50:01.932191122Z"
+    description: A Helm chart for Kubernetes
+    digest: 0b928831f3e100c2a165c6c962e6a4e1715acb03510a405c1b6687b90b657742
+    home: https://github.com/usememos/helm
+    icon: https://raw.githubusercontent.com/usememos/dotcom/main/public/logo.png
+    keywords:
+    - memos
+    - notes
+    - helm
+    maintainers:
+    - email: usememos@gmail.com
+      name: usememos
+    name: memos
+    sources:
+    - https://github.com/usememos/memos
+    - https://github.com/usememos/helm
+    type: application
+    urls:
+    - https://github.com/caseyrobb/helm-charts/releases/download/memos-0.5.0/memos-0.5.0.tgz
+    version: 0.5.0
+  - annotations:
+      artifacthub.io/categories: Productivity
+      artifacthub.io/changes: https://github.com/usememos/helm/blob/main/CHANGELOG.md
+    apiVersion: v2
     appVersion: 26.11.0
     created: "2026-11-02T17:28:23.117338666Z"
     description: A Helm chart for Kubernetes
@@ -507,6 +532,22 @@ entries:
   silo-server:
   - apiVersion: v2
     appVersion: latest
+    created: "2026-11-16T15:50:02.185563726Z"
+    description: A Helm chart for Silo Server - a self-hosted media server for films,
+      series, audiobooks, ebooks, podcasts, and manga
+    digest: 1c154663f178f5c0c22e7ea6888e3d3a374c0b9b74c0887bde6b2be98843b221
+    home: https://github.com/Silo-Server/silo-server
+    maintainers:
+    - name: self-hosted
+    name: silo-server
+    sources:
+    - https://github.com/Silo-Server/silo-server
+    type: application
+    urls:
+    - https://github.com/caseyrobb/helm-charts/releases/download/silo-server-0.6.2/silo-server-0.6.2.tgz
+    version: 0.6.2
+  - apiVersion: v2
+    appVersion: latest
     created: "2026-11-16T02:15:07.668853534Z"
     description: A Helm chart for Silo Server - a self-hosted media server for films,
       series, audiobooks, ebooks, podcasts, and manga
@@ -697,4 +738,4 @@ entries:
     urls:
     - https://caseyrobb.github.io/helm-charts/silo-server-0.4.1.tgz
     version: 0.4.1
-generated: "2026-11-16T02:15:07.668956116Z"
+generated: "2026-11-16T15:50:02.185616376Z"
