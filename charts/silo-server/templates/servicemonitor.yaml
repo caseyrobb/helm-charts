@@ -18,7 +18,9 @@ spec:
       path: /metrics
       interval: {{ .Values.metrics.serviceMonitor.interval }}
       scrapeTimeout: {{ .Values.metrics.serviceMonitor.scrapeTimeout }}
-      sampleLimit: {{ .Values.metrics.serviceMonitor.sampleLimit }}
+      {{- with .Values.metrics.serviceMonitor.sampleLimit }}
+      sampleLimit: {{ . }}
+      {{- end }}
       relabelings:
         # Upstream alert rules (deploy/observability/silo.rules.yml) key on
         # {job="silo"}; replace the operator-generated scrape job name.
