@@ -113,6 +113,31 @@ entries:
       artifacthub.io/categories: Productivity
       artifacthub.io/changes: https://github.com/usememos/helm/blob/main/CHANGELOG.md
     apiVersion: v2
+    appVersion: 26.11.2
+    created: "2026-11-27T20:03:09.815321693Z"
+    description: A Helm chart for Kubernetes
+    digest: 82f01a5a205cec55c492934988bb3b6f0805b8cf16758249f2c1190e74d6e3a9
+    home: https://github.com/usememos/helm
+    icon: https://raw.githubusercontent.com/usememos/dotcom/main/public/logo.png
+    keywords:
+    - memos
+    - notes
+    - helm
+    maintainers:
+    - email: usememos@gmail.com
+      name: usememos
+    name: memos
+    sources:
+    - https://github.com/usememos/memos
+    - https://github.com/usememos/helm
+    type: application
+    urls:
+    - https://github.com/caseyrobb/helm-charts/releases/download/memos-0.6.0/memos-0.6.0.tgz
+    version: 0.6.0
+  - annotations:
+      artifacthub.io/categories: Productivity
+      artifacthub.io/changes: https://github.com/usememos/helm/blob/main/CHANGELOG.md
+    apiVersion: v2
     appVersion: 26.11.1
     created: "2026-11-16T15:50:01.932191122Z"
     description: A Helm chart for Kubernetes
@@ -235,6 +260,35 @@ entries:
     - https://github.com/caseyrobb/helm-charts/releases/download/memos-0.2.1/memos-0.2.1.tgz
     version: 0.2.1
   paperless-ngx:
+  - apiVersion: v2
+    appVersion: 3.5.1
+    created: "2026-11-27T20:03:10.166855732Z"
+    dependencies:
+    - condition: redis.enabled
+      name: redis
+      repository: oci://registry-1.docker.io/bitnamicharts
+      version: 28.3.16
+    description: A Helm chart for Paperless-ngx, a community-supported open-source
+      document management system.
+    digest: 63d2cfbc04be3ac3e178637ce42b42ce8aa110766f7a1053029c850104e8eb51
+    home: https://docs.paperless-ngx.com/
+    icon: https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/resources/logo/web/png/Logo-Symbol/Black/PNG/Black%20logo%20-%20no%20background.png
+    keywords:
+    - paperless
+    - paperless-ngx
+    - document-management
+    - dms
+    - ocr
+    maintainers:
+    - name: Casey Robb
+      url: https://github.com/paperless-ngx/paperless-ngx
+    name: paperless-ngx
+    sources:
+    - https://github.com/paperless-ngx/paperless-ngx
+    type: application
+    urls:
+    - https://github.com/caseyrobb/helm-charts/releases/download/paperless-ngx-0.10.0/paperless-ngx-0.10.0.tgz
+    version: 0.10.0
   - apiVersion: v2
     appVersion: 3.4.2
     created: "2026-11-12T21:45:46.015507969Z"
@@ -532,6 +586,22 @@ entries:
   silo-server:
   - apiVersion: v2
     appVersion: latest
+    created: "2026-11-27T20:03:10.360607188Z"
+    description: A Helm chart for Silo Server - a self-hosted media server for films,
+      series, audiobooks, ebooks, podcasts, and manga
+    digest: a14d5beea55d4dc153cf4c2487544aabb5e2d36cf65c5e21fbff2a1ed3364ab4
+    home: https://github.com/Silo-Server/silo-server
+    maintainers:
+    - name: self-hosted
+    name: silo-server
+    sources:
+    - https://github.com/Silo-Server/silo-server
+    type: application
+    urls:
+    - https://github.com/caseyrobb/helm-charts/releases/download/silo-server-0.6.3/silo-server-0.6.3.tgz
+    version: 0.6.3
+  - apiVersion: v2
+    appVersion: latest
     created: "2026-11-16T15:50:02.185563726Z"
     description: A Helm chart for Silo Server - a self-hosted media server for films,
       series, audiobooks, ebooks, podcasts, and manga
@@ -738,4 +808,4 @@ entries:
     urls:
     - https://caseyrobb.github.io/helm-charts/silo-server-0.4.1.tgz
     version: 0.4.1
-generated: "2026-11-16T15:50:02.185616376Z"
+generated: "2026-11-27T20:03:10.360683482Z"
